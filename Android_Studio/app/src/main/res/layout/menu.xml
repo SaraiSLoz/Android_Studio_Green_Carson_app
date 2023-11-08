@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    tools:context=".LoginActivity">
 
     <ImageView
         android:id="@+id/imageView2"
@@ -17,7 +17,8 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.0"
-        app:srcCompat="@drawable/gc_app_pantallas_blanco" />
+        app:srcCompat="@drawable/gc_app_pantallas_blanco"
+        tools:ignore="ImageContrastCheck" />
 
     <ImageView
         android:id="@+id/imageView4"
@@ -29,7 +30,8 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/imageView2"
-        app:srcCompat="@drawable/cuadrado" />
+        app:srcCompat="@drawable/cuadrado"
+        tools:ignore="ImageContrastCheck,VisualLintBounds" />
 
     <TextView
         android:id="@+id/textView3"
@@ -37,12 +39,13 @@
         android:layout_height="wrap_content"
         android:fontFamily="@font/archivo_black"
         android:text="@string/reportes"
-        android:textColor="@color/white"
+        android:textColor="#009688"
         android:textSize="30sp"
         app:layout_constraintBottom_toBottomOf="@+id/imageView4"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@+id/imageView4"
-        app:layout_constraintTop_toTopOf="@+id/imageView4" />
+        app:layout_constraintTop_toTopOf="@+id/imageView4"
+        tools:ignore="TextContrastCheck" />
 
     <Button
         android:id="@+id/button"
@@ -56,7 +59,8 @@
         app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="@+id/imageView2"
         app:layout_constraintTop_toBottomOf="@+id/imageView4"
-        app:layout_constraintVertical_bias="0.105" />
+        app:layout_constraintVertical_bias="0.105"
+        tools:ignore="TextContrastCheck,DuplicateSpeakableTextCheck" />
 
     <Button
         android:id="@+id/button2"
@@ -64,6 +68,7 @@
         android:layout_height="60dp"
         android:backgroundTint="#2fb0c6"
         android:text="Residuos"
+        android:textColor="#4A148C"
         app:cornerRadius="10dp"
         app:layout_constraintBottom_toBottomOf="@+id/imageView2"
         app:layout_constraintEnd_toEndOf="@+id/imageView2"
@@ -86,7 +91,7 @@
         app:layout_constraintStart_toStartOf="@+id/imageView2"
         app:layout_constraintTop_toBottomOf="@+id/button2"
         app:layout_constraintVertical_bias="0.286"
-        tools:ignore="HardcodedText" />
+        tools:ignore="HardcodedText,TextContrastCheck" />
 
     <Button
         android:id="@+id/button4"
@@ -102,7 +107,7 @@
 
         app:layout_constraintTop_toBottomOf="@+id/button3"
         app:layout_constraintVertical_bias="0.403"
-        tools:ignore="HardcodedText" />
+        tools:ignore="HardcodedText,TextContrastCheck" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
