@@ -6,21 +6,20 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.FirebaseApp;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 public class LoginActivity extends AppCompatActivity {
 
     Button sesion;
-    EditText email,password;
+    EditText email, password;
 
+    FirebaseAuth mAuth = FirebaseAuth.getInstance();
     DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("recolectores");
 
     @SuppressLint("MissingInflatedId")
@@ -33,73 +32,35 @@ public class LoginActivity extends AppCompatActivity {
         password = findViewById(R.id.password_t);
         sesion = findViewById(R.id.button_sesion);
 
+
         sesion.setOnClickListener(v -> {
             String emailUser = email.getText().toString().trim();
             String passUser = password.getText().toString().trim();
 
-            if(emailUser.isEmpty() && passUser.isEmpty()){
-                Toast.makeText(LoginActivity.this,"Ingresa los datos", Toast.LENGTH_SHORT).show();
-            }
-            else{
-                boolean us = loginUser(emailUser);
-                boolean ps = loginPassword(passUser);
-                if(us && ps){
-                    setContentView(R.layout.menu);
-                }
+            if (emailUser.isEmpty() && passUser.isEmpty()) {
+                Toast.makeText(LoginActivity.this, "Ingresa los datos", Toast.LENGTH_SHORT).show();
+            } else {
+                loginUserWithEmailAndPassword(emailUser, passUser);
             }
         });
 
+    }
+        private void loginUserWithEmailAndPassword (String email, String password){
+            mAuth.signInWithEmailAndPassword(email, password)
+                    .addOnCompleteListener(this, task -> {
+                        if (task.isSuccessful()) {
+                            // Inicio de sesión exitoso
+                            FirebaseUser user = mAuth.getCurrentUser();
+                            if (user != null) {
+                                // El usuario está autenticado, puedes pasar a la siguiente actividad o realizar otras acciones
+                                setContentView(R.layout.menu);
+                            }
+                        } else {
+                            // Si el inicio de sesión falla, muestra un mensaje al usuario
+                            Toast.makeText(LoginActivity.this, "Inicio de sesión fallido", Toast.LENGTH_SHORT).show();
+                        }
+                    });
 
-
+        }
 
     }
-
-    private boolean loginUser(String data) {
-        final String[] valor = new String[1];
-        databaseReference.child("administradores").child("nombre").addListenerForSingleValueEvent(new ValueEventListener() {
-
-            @SuppressLint("SetTextI18n")
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.exists()) {
-                    valor[0] = snapshot.getValue(String.class); // Obtén el valor de la base de datos
-                } else {
-                    Toast.makeText(LoginActivity.this,"Usuario o contrasena no válidos", Toast.LENGTH_SHORT).show();
-                }
-
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(LoginActivity.this, "Error al acceder a la base de datos", Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        return valor[0].equals(data);
-    }
-
-    private boolean loginPassword(String data) {
-        final String[] valor = new String[1];
-        databaseReference.child("administradores").child("contraseña").addListenerForSingleValueEvent(new ValueEventListener() {
-
-            @SuppressLint("SetTextI18n")
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.exists()) {
-                    valor[0] = snapshot.getValue(String.class); // Obtén el valor de la base de datos
-                } else {
-                    Toast.makeText(LoginActivity.this,"Usuario o contrasena no válidos", Toast.LENGTH_SHORT).show();
-                }
-
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(LoginActivity.this, "Error al acceder a la base de datos", Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        return valor[0].equals(data);
-    }
-
-}
