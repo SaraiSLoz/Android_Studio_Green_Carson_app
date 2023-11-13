@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".LoginActivity">
+    tools:context=".menu">
 
     <ImageView
         android:id="@+id/imageView2"
@@ -48,11 +48,11 @@
         tools:ignore="TextContrastCheck" />
 
     <Button
-        android:id="@+id/button"
+        android:id="@+id/Usuario_but"
         android:layout_width="196dp"
         android:layout_height="60dp"
         android:backgroundTint="#2fb0c6"
-        android:text="@string/residuos"
+        android:text="Usuarios"
         app:cornerRadius="10dp"
         app:layout_constraintBottom_toBottomOf="@+id/imageView2"
         app:layout_constraintEnd_toEndOf="@+id/imageView2"
@@ -60,41 +60,41 @@
         app:layout_constraintStart_toStartOf="@+id/imageView2"
         app:layout_constraintTop_toBottomOf="@+id/imageView4"
         app:layout_constraintVertical_bias="0.105"
-        tools:ignore="TextContrastCheck,DuplicateSpeakableTextCheck" />
+        tools:ignore="DuplicateSpeakableTextCheck,HardcodedText,TextContrastCheck" />
 
     <Button
-        android:id="@+id/button2"
+        android:id="@+id/Recolectores_but"
         android:layout_width="196dp"
         android:layout_height="60dp"
         android:backgroundTint="#2fb0c6"
-        android:text="Residuos"
+        android:text="Recolectores"
         android:textColor="#FFF"
         app:cornerRadius="10dp"
         app:layout_constraintBottom_toBottomOf="@+id/imageView2"
         app:layout_constraintEnd_toEndOf="@+id/imageView2"
         app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="@+id/imageView2"
-        app:layout_constraintTop_toBottomOf="@+id/button"
+        app:layout_constraintTop_toBottomOf="@+id/Usuario_but"
         app:layout_constraintVertical_bias="0.175"
         tools:ignore="HardcodedText" />
 
     <Button
-        android:id="@+id/button3"
+        android:id="@+id/Centros_but"
         android:layout_width="196dp"
         android:layout_height="60dp"
         android:backgroundTint="#2fb0c6"
-        android:text="Residuos"
+        android:text="Centros"
         app:cornerRadius="10dp"
         app:layout_constraintBottom_toBottomOf="@+id/imageView2"
         app:layout_constraintEnd_toEndOf="@+id/imageView2"
         app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="@+id/imageView2"
-        app:layout_constraintTop_toBottomOf="@+id/button2"
+        app:layout_constraintTop_toBottomOf="@+id/Recolectores_but"
         app:layout_constraintVertical_bias="0.286"
         tools:ignore="HardcodedText,TextContrastCheck" />
 
     <Button
-        android:id="@+id/button4"
+        android:id="@+id/Residuos_but"
         android:layout_width="196dp"
         android:layout_height="60dp"
         android:backgroundTint="#2fb0c6"
@@ -104,8 +104,7 @@
         app:layout_constraintEnd_toEndOf="@+id/imageView2"
         app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="@+id/imageView2"
-
-        app:layout_constraintTop_toBottomOf="@+id/button3"
+        app:layout_constraintTop_toBottomOf="@+id/Centros_but"
         app:layout_constraintVertical_bias="0.403"
         tools:ignore="HardcodedText,TextContrastCheck" />
 
