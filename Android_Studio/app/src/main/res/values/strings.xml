@@ -8,4 +8,6 @@
     <string name="residuos">Residuos</string>
     <string name="recolectores">Recolectores</string>
     <string name="textview">TextView</string>
+    <string name="Usuarios" />
+    <string name="usuarios">Usuarios</string>
 </resources>
