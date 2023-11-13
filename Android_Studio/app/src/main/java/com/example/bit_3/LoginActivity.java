@@ -11,8 +11,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -20,7 +18,7 @@ public class LoginActivity extends AppCompatActivity {
     EditText email, password;
 
     FirebaseAuth mAuth = FirebaseAuth.getInstance();
-    DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("recolectores");
+    //DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("recolectores");
 
     @SuppressLint("MissingInflatedId")
     protected void onCreate(Bundle savedInstanceState) {
