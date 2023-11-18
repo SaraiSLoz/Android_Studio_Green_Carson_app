@@ -1,6 +1,7 @@
 package com.example.bit_3;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
@@ -51,7 +52,8 @@ public class LoginActivity extends AppCompatActivity {
                             FirebaseUser user = mAuth.getCurrentUser();
                             if (user != null) {
                                 // El usuario está autenticado, puedes pasar a la siguiente actividad o realizar otras acciones
-                                setContentView(R.layout.menu);
+                                Intent intent = new Intent(LoginActivity.this, MenuActivity.class);
+                                startActivity(intent);
                             }
                         } else {
                             // Si el inicio de sesión falla, muestra un mensaje al usuario

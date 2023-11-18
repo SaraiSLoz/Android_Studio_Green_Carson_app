@@ -1,12 +1,14 @@
 package com.example.bit_3;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-public class menu extends AppCompatActivity {
+public class Menu extends AppCompatActivity {
 
     Button Usuario, Recolectores, Centros, Residuos;
     @SuppressLint("MissingInflatedId")
@@ -19,9 +21,10 @@ public class menu extends AppCompatActivity {
         Residuos = findViewById(R.id.Residuos_but);
 
 
-        Usuario.setOnClickListener(v -> setContentView(R.layout.usuarios));
-        Recolectores.setOnClickListener(v -> setContentView(R.layout.recolectores));
-        Centros.setOnClickListener(v -> setContentView(R.layout.centros));
-        Residuos.setOnClickListener(v -> setContentView(R.layout.residuos));
+    }
+
+    public void irARecolectores(View v)  {
+        Intent i = new Intent(this, RecolectoresActivity.class);
+        startActivity(i);
     }
 }
