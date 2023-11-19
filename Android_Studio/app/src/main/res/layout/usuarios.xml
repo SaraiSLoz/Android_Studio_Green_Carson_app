@@ -3,7 +3,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".UsuariosActivity">
+
 
     <ImageView
         android:id="@+id/cintillo"
@@ -11,12 +13,11 @@
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/imageView4"
         app:layout_constraintVertical_bias="1.0"
         app:srcCompat="@drawable/gc_app_pantallas_blanco" />
-
 
     <ImageView
         android:id="@+id/imageView4"
@@ -30,18 +31,6 @@
         app:layout_constraintVertical_bias="0.0"
         app:srcCompat="@drawable/cuadrado" />
 
-    <ImageView
-        android:id="@+id/imageView5"
-        android:layout_width="48dp"
-        android:layout_height="45dp"
-        app:layout_constraintBottom_toBottomOf="@+id/imageView4"
-        app:layout_constraintEnd_toStartOf="@+id/usuarios"
-        app:layout_constraintHorizontal_bias="0.158"
-        app:layout_constraintStart_toStartOf="@+id/imageView4"
-        app:layout_constraintTop_toTopOf="@+id/cintillo"
-        app:layout_constraintVertical_bias="0.581"
-        app:srcCompat="@drawable/flecha_izquierda__1_" />
-
     <TextView
         android:id="@+id/usuarios"
         android:layout_width="wrap_content"
@@ -54,4 +43,16 @@
         app:layout_constraintEnd_toEndOf="@+id/imageView4"
         app:layout_constraintStart_toStartOf="@+id/imageView4"
         app:layout_constraintTop_toTopOf="@+id/cintillo" />
+
+    <ImageButton
+        android:id="@+id/atras_b"
+        android:layout_width="48dp"
+        android:layout_height="45dp"
+        app:layout_constraintBottom_toBottomOf="@+id/imageView4"
+        app:layout_constraintEnd_toStartOf="@+id/usuarios"
+        app:layout_constraintStart_toStartOf="@+id/imageView4"
+        app:layout_constraintTop_toTopOf="@+id/cintillo"
+        app:srcCompat="@drawable/android_arrow_back_icon_icons_com_50546"
+        android:background="@null"/>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

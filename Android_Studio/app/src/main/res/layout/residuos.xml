@@ -3,7 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    tools:context=".ResiduosActivity">
 
     <ImageView
         android:id="@+id/fondo"
@@ -42,14 +43,14 @@
         app:layout_constraintTop_toTopOf="@+id/fondo"
         tools:ignore="HardcodedText" />
 
-    <ImageView
-        android:id="@+id/imageView10"
+    <ImageButton
+        android:id="@+id/atras_b"
         android:layout_width="48dp"
         android:layout_height="45dp"
         app:layout_constraintBottom_toBottomOf="@+id/imageView9"
         app:layout_constraintEnd_toStartOf="@+id/residuos"
         app:layout_constraintStart_toStartOf="@+id/imageView9"
         app:layout_constraintTop_toTopOf="@+id/fondo"
-        app:srcCompat="@drawable/flecha_izquierda__1_"
-        tools:ignore="ContentDescription" />
+        app:srcCompat="@drawable/android_arrow_back_icon_icons_com_50546"
+        android:background="@null"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

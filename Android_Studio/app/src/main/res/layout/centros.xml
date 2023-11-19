@@ -3,7 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    tools:context=".CentrosActivity">
 
     <ImageView
         android:id="@+id/imageView3"
@@ -45,15 +46,14 @@
         tools:ignore="HardcodedText" />
 
     <ImageView
-        android:id="@+id/imageView7"
+        android:id="@+id/atras_b"
         android:layout_width="48dp"
         android:layout_height="45dp"
         app:layout_constraintBottom_toBottomOf="@+id/imageView6"
         app:layout_constraintEnd_toStartOf="@+id/centros"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/imageView6"
         app:layout_constraintTop_toTopOf="@+id/imageView3"
-        app:srcCompat="@drawable/flecha_izquierda__1_"
-        tools:ignore="ContentDescription" />
+        app:srcCompat="@drawable/android_arrow_back_icon_icons_com_50546" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

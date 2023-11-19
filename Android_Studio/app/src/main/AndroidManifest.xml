@@ -20,7 +20,17 @@
         <activity
             android:name=".RecolectoresActivity"
             android:exported="false"
-            android:label="@string/title_activity_menu"
+            android:label="RecolectoresActivity"
+            android:theme="@style/Theme.Bit_3"/>
+        <activity
+            android:name=".CentrosActivity"
+            android:exported="false"
+            android:label="CentrosActivity"
+            android:theme="@style/Theme.Bit_3"/>
+        <activity
+            android:name=".ResiduosActivity"
+            android:exported="false"
+            android:label="ResiduosActivity"
             android:theme="@style/Theme.Bit_3"/>
         <activity
             android:name=".LoginActivity"
@@ -34,13 +44,8 @@
         <activity
             android:name=".UsuariosActivity"
             android:exported="true"
-            android:label="@string/title_activity_usuarios"
+            android:label="UsuariosActivity"
             android:theme="@style/Theme.Bit_3">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
     </application>
 
