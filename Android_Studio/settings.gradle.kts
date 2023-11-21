@@ -1,4 +1,4 @@
-@file:Suppress("DEPRECATION")
+import org.gradle.api.initialization.resolve.RepositoriesMode
 
 pluginManagement {
     repositories {
@@ -7,13 +7,12 @@ pluginManagement {
         gradlePluginPortal()
     }
 }
+
 dependencyResolutionManagement {
-    @Suppress("UnstableApiUsage")
-    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS)
     repositories {
         google()
         mavenCentral()
-        //noinspection JcenterRepositoryObsolete
         jcenter() // Warning: this repository is going to shut down soon
         maven { url = uri("https://jitpack.io") }
     }
