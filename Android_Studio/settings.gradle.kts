@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 pluginManagement {
     repositories {
         google()
@@ -6,10 +8,14 @@ pluginManagement {
     }
 }
 dependencyResolutionManagement {
+    @Suppress("UnstableApiUsage")
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
         google()
         mavenCentral()
+        //noinspection JcenterRepositoryObsolete
+        jcenter() // Warning: this repository is going to shut down soon
+        maven { url = uri("https://jitpack.io") }
     }
 }
 
