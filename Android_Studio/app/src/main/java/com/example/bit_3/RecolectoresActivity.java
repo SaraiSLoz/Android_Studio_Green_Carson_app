@@ -1,80 +1,126 @@
 package com.example.bit_3;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
-import android.os.Bundle;
-import android.view.View;
-import android.widget.ImageButton;
-
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.Color;
-import android.os.Bundle;
-import android.view.View;
-import android.widget.ImageButton;
-import androidx.appcompat.app.AppCompatActivity;
-import android.util.Log;
-import androidx.annotation.Nullable;
-import android.animation.ValueAnimator;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.LinearGradient;
-import android.graphics.Shader;
-import android.graphics.Paint;
-import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
+import android.graphics.pdf.PdfDocument;
+import android.os.Build;
+import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
+import android.util.DisplayMetrics;
+import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.Toast;
 
+import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AppCompatActivity;
 
-
-import com.github.mikephil.charting.charts.BarChart;
-import com.github.mikephil.charting.components.XAxis;
-import com.github.mikephil.charting.data.BarData;
-import com.github.mikephil.charting.data.BarDataSet;
-import com.github.mikephil.charting.data.BarEntry;
-import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
-import com.github.mikephil.charting.utils.ColorTemplate;
-import com.github.mikephil.charting.components.YAxis;
-import com.github.mikephil.charting.formatter.ValueFormatter;
-import com.github.mikephil.charting.components.Legend;
-import com.github.mikephil.charting.charts.PieChart;
-import com.github.mikephil.charting.data.PieData;
-import com.github.mikephil.charting.data.PieDataSet;
-import com.github.mikephil.charting.data.PieEntry;
-import com.github.mikephil.charting.utils.ColorTemplate;
 import com.github.mikephil.charting.animation.Easing;
 import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.charts.PieChart;
+import com.github.mikephil.charting.components.Legend;
+import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
-import com.github.mikephil.charting.utils.ColorTemplate;
+import com.github.mikephil.charting.data.PieData;
+import com.github.mikephil.charting.data.PieDataSet;
+import com.github.mikephil.charting.data.PieEntry;
 import com.github.mikephil.charting.formatter.ValueFormatter;
-import com.github.mikephil.charting.components.XAxis;
-import com.github.mikephil.charting.components.YAxis;
-import com.github.mikephil.charting.components.Legend;
-import com.github.mikephil.charting.data.Entry;
-import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
-
 import com.google.firebase.firestore.EventListener;
-import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Locale;
+import java.util.Map;
+
+class PdfChartGenerator{
+
+    // Esta función genera un PDF a partir de un gráfico
+
+    @SuppressLint("NewApi")
+    public static void generatePdfFromChart(Context context, LineChart chart, String pdfFileName) {
+        // Crea un documento PDF
+        PdfDocument pdfDocument = new PdfDocument();
+
+        // Configura el tamaño de la página
+        int width = chart.getWidth();
+        int height = chart.getHeight();
+
+        // Configura la página
+        PdfDocument.PageInfo pageInfo = new PdfDocument.PageInfo.Builder(width, height, 1).create();
+        PdfDocument.Page page = pdfDocument.startPage(pageInfo);
+
+        // Dibuja el contenido del gráfico en la página
+        Canvas canvas = page.getCanvas();
+        Bitmap bitmap = getChartBitmap(chart);
+        canvas.drawBitmap(bitmap, 0, 0, null);
+
+        // Finaliza la página
+        pdfDocument.finishPage(page);
+
+        // Guarda el documento en un archivo PDF
+        savePdf(context, pdfDocument, pdfFileName);
+
+        // Cierra el documento
+        pdfDocument.close();
+
+        // Muestra un mensaje al usuario
+        Toast.makeText(context, "PDF generado correctamente", Toast.LENGTH_SHORT).show();
+    }
 
 
-import androidx.appcompat.app.AppCompatActivity;
+    // Esta función convierte el gráfico a un mapa de bits para su posterior uso en el PDF
+    private static Bitmap getChartBitmap(LineChart chart) {
+        chart.setDrawingCacheEnabled(true);
+        chart.buildDrawingCache(true);
+        Bitmap bitmap = Bitmap.createBitmap(chart.getDrawingCache());
+        chart.setDrawingCacheEnabled(false);
+        return bitmap;
+    }
 
+    // Esta función guarda el documento PDF en el almacenamiento externo
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    private static void savePdf(Context context, PdfDocument pdfDocument, String pdfFileName) {
+        File directory = new File(Environment.getExternalStorageDirectory(), "Download");
+
+        if (!directory.exists()) {
+            directory.mkdirs();
+        }
+
+        File file = new File(directory, pdfFileName + ".pdf");
+
+        try {
+            pdfDocument.writeTo(Files.newOutputStream(file.toPath()));
+        } catch (IOException e) {
+            e.printStackTrace();
+            Toast.makeText(context, "Error al guardar el PDF", Toast.LENGTH_SHORT).show();
+        }
+    }
+}
 public class RecolectoresActivity extends AppCompatActivity {
 
     ImageButton atras;
+    Button descargarPDFButton;
     private LineChart collectionTimeLineChart;
 
     private PieChart pieChart;
@@ -85,6 +131,7 @@ public class RecolectoresActivity extends AppCompatActivity {
     private FirebaseFirestore db;
     private List<BarEntry> entries; // And this line
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -109,6 +156,18 @@ public class RecolectoresActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+        descargarPDFButton = findViewById(R.id.descargarPDFButton);
+        descargarPDFButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                descargarPDF();
+            }
+        });
+    }
+    @SuppressLint("NewApi")
+    private void descargarPDF() {
+        PdfChartGenerator.generatePdfFromChart(this, collectionTimeLineChart, "mi_archivo_pdf");
+        Toast.makeText(this, "PDF generado correctamente y guardado", Toast.LENGTH_SHORT).show();
     }
 
     private void setupPieChart() {
@@ -181,6 +240,7 @@ public class RecolectoresActivity extends AppCompatActivity {
 
     private void loadCollectionTimesDataFromFirestore() {
         db.collection("recolecciones").addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public void onEvent(@Nullable QuerySnapshot snapshots,
                                 @Nullable FirebaseFirestoreException e) {
@@ -219,6 +279,7 @@ public class RecolectoresActivity extends AppCompatActivity {
 
         // Set the value formatter to display values as percentages
         dataSet.setValueFormatter(new ValueFormatter() {
+            @SuppressLint("DefaultLocale")
             @Override
             public String getFormattedValue(float value) {
                 // Assuming 'value' is already calculated as a percentage
@@ -240,6 +301,8 @@ public class RecolectoresActivity extends AppCompatActivity {
         pieChart.invalidate(); // Refresh the chart
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    @SuppressLint("ObsoleteSdkInt")
     private void updateLineChart(Map<Integer, Integer> collectionTimes) {
         List<Entry> entries = new ArrayList<>();
 

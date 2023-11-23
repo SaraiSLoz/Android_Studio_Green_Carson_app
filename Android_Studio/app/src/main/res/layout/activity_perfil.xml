@@ -14,7 +14,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/gc_app_pantallas_blanco" />
+        app:srcCompat="@drawable/gc_app_pantallas_blanco"
+        tools:ignore="ContentDescription" />
 
     <ImageView
         android:id="@+id/cintillo2"
@@ -26,7 +27,8 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.0"
-        app:srcCompat="@drawable/cuadrado" />
+        app:srcCompat="@drawable/cuadrado"
+        tools:ignore="ContentDescription,VisualLintBounds" />
 
     <TextView
         android:id="@+id/textperfil"
@@ -34,23 +36,25 @@
         android:layout_height="wrap_content"
         android:fontFamily="@font/archivo_black"
         android:text="Perfil"
-        android:textSize="30dp"
         android:textColor="@color/white"
+        android:textSize="30dp"
         app:layout_constraintBottom_toBottomOf="@+id/cintillo2"
         app:layout_constraintEnd_toEndOf="@+id/cintillo2"
         app:layout_constraintStart_toStartOf="@+id/cintillo2"
-        app:layout_constraintTop_toTopOf="@+id/cintillo2" />
+        app:layout_constraintTop_toTopOf="@+id/cintillo2"
+        tools:ignore="HardcodedText,SpUsage,TextContrastCheck" />
 
     <ImageButton
         android:id="@+id/but_atras"
         android:layout_width="48dp"
         android:layout_height="45dp"
+        android:background="@null"
         app:layout_constraintBottom_toBottomOf="@+id/cintillo2"
         app:layout_constraintEnd_toStartOf="@+id/textperfil"
         app:layout_constraintStart_toStartOf="@+id/cintillo2"
         app:layout_constraintTop_toTopOf="@+id/imageView7"
         app:srcCompat="@drawable/android_arrow_back_icon_icons_com_50546"
-        android:background="@null"/>
+        tools:ignore="ContentDescription,SpeakableTextPresentCheck,TouchTargetSizeCheck" />
 
     <TextView
         android:id="@+id/textNombre"
@@ -64,7 +68,8 @@
         app:layout_constraintEnd_toEndOf="@+id/imageView7"
         app:layout_constraintHorizontal_bias="0.209"
         app:layout_constraintStart_toStartOf="@+id/imageView7"
-        app:layout_constraintTop_toBottomOf="@+id/cintillo2" />
+        app:layout_constraintTop_toBottomOf="@+id/cintillo2"
+        tools:ignore="HardcodedText,SpUsage,TextSizeCheck" />
 
 
     <TextView
@@ -79,7 +84,8 @@
         app:layout_constraintHorizontal_bias="0.203"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textNombre"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintVertical_bias="0.0"
+        tools:ignore="HardcodedText,SpUsage,TextSizeCheck" />
 
 
 
