@@ -20,10 +20,17 @@ public class LoginActivity extends AppCompatActivity {
 
     FirebaseAuth mAuth = FirebaseAuth.getInstance();
     //DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("recolectores");
-
+    public boolean isUserAuthenticated() {
+        FirebaseUser user = mAuth .getCurrentUser();
+        return user != null;
+    }
     @SuppressLint("MissingInflatedId")
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if(isUserAuthenticated()){
+            Intent intent = new Intent(LoginActivity.this, MenuActivity.class);
+            startActivity(intent);
+        }
         setContentView(R.layout.activity_main);
         FirebaseApp.initializeApp(this);
 
@@ -44,6 +51,7 @@ public class LoginActivity extends AppCompatActivity {
         });
 
     }
+
         private void loginUserWithEmailAndPassword (String email, String password){
             mAuth.signInWithEmailAndPassword(email, password)
                     .addOnCompleteListener(this, task -> {
@@ -52,6 +60,7 @@ public class LoginActivity extends AppCompatActivity {
                             FirebaseUser user = mAuth.getCurrentUser();
                             if (user != null) {
                                 // El usuario está autenticado, puedes pasar a la siguiente actividad o realizar otras acciones
+                                SharedPreferencesUtil.saveUserUidToSharedPreferences(this,email);
                                 Intent intent = new Intent(LoginActivity.this, MenuActivity.class);
                                 startActivity(intent);
                             }

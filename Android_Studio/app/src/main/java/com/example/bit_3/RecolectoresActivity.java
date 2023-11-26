@@ -2,17 +2,19 @@ package com.example.bit_3;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.pdf.PdfDocument;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -21,6 +23,7 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.github.mikephil.charting.animation.Easing;
@@ -43,7 +46,6 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
@@ -53,28 +55,34 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-class PdfChartGenerator{
+abstract class PdfChartGenerator extends Context {
 
     // Esta función genera un PDF a partir de un gráfico
 
     @SuppressLint("NewApi")
-    public static void generatePdfFromChart(Context context, LineChart chart, String pdfFileName) {
+    public static void generatePdfFromChart(Context context, LineChart chart, PieChart pie, String pdfFileName) {
         // Crea un documento PDF
         PdfDocument pdfDocument = new PdfDocument();
 
         // Configura el tamaño de la página
-        int width = chart.getWidth();
-        int height = chart.getHeight();
+        int width = chart.getWidth(); //612 y 792
+        int height = chart.getHeight()+ pie.getHeight() + 150;
 
         // Configura la página
-        PdfDocument.PageInfo pageInfo = new PdfDocument.PageInfo.Builder(width, height, 1).create();
+        PdfDocument.PageInfo pageInfo = new PdfDocument.PageInfo.Builder(width, height, 2).create();
         PdfDocument.Page page = pdfDocument.startPage(pageInfo);
-
+        Paint paint = new Paint();
+        paint.setColor(Color.BLACK);
+        paint.setTextSize(50f);
+        paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
         // Dibuja el contenido del gráfico en la página
         Canvas canvas = page.getCanvas();
         Bitmap bitmap = getChartBitmap(chart);
-        canvas.drawBitmap(bitmap, 0, 0, null);
-
+        canvas.drawText("Recolecciones",150, 50 ,paint);
+        canvas.drawBitmap(bitmap, 0, 20, null);
+        Bitmap bitmappie = getPieBitMap(pie);
+        canvas.drawText("Usuarios",150, chart.getHeight()+50 ,paint);
+        canvas.drawBitmap(bitmappie, 0, chart.getHeight()+70, null);
         // Finaliza la página
         pdfDocument.finishPage(page);
 
@@ -86,6 +94,14 @@ class PdfChartGenerator{
 
         // Muestra un mensaje al usuario
         Toast.makeText(context, "PDF generado correctamente", Toast.LENGTH_SHORT).show();
+    }
+
+    private static Bitmap getPieBitMap(PieChart pie) {
+        pie.setDrawingCacheEnabled(true);
+        pie.buildDrawingCache(true);
+        Bitmap bitmap = Bitmap.createBitmap(pie.getDrawingCache());
+        pie.setDrawingCacheEnabled(false);
+        return bitmap;
     }
 
 
@@ -116,10 +132,22 @@ class PdfChartGenerator{
             Toast.makeText(context, "Error al guardar el PDF", Toast.LENGTH_SHORT).show();
         }
     }
+    private void mostrarAlertDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        builder.setTitle("Documento descargado con éxito")
+                .setMessage("El pdf fue generado y guardado exitosamente")
+                .setPositiveButton("Entendido", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss(); // Cierra el diálogo
+                    }
+                });
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+    }
 }
 public class RecolectoresActivity extends AppCompatActivity {
 
-    ImageButton atras;
     Button descargarPDFButton;
     private LineChart collectionTimeLineChart;
 
@@ -147,15 +175,7 @@ public class RecolectoresActivity extends AppCompatActivity {
         loadCollectionTimesDataFromFirestore();
         loadStatusDataFromFirestore();
 
-        atras = findViewById(R.id.atras_b);
 
-        atras.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(RecolectoresActivity.this, MenuActivity.class);
-                startActivity(intent);
-            }
-        });
         descargarPDFButton = findViewById(R.id.descargarPDFButton);
         descargarPDFButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -166,7 +186,7 @@ public class RecolectoresActivity extends AppCompatActivity {
     }
     @SuppressLint("NewApi")
     private void descargarPDF() {
-        PdfChartGenerator.generatePdfFromChart(this, collectionTimeLineChart, "mi_archivo_pdf");
+        PdfChartGenerator.generatePdfFromChart(this, collectionTimeLineChart, pieChart, "graficas5");
         Toast.makeText(this, "PDF generado correctamente y guardado", Toast.LENGTH_SHORT).show();
     }
 

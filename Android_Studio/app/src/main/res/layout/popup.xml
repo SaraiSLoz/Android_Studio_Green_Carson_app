@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical"
+    android:background="@android:color/background_light"
+    tools:context=".Perfil">
+
+    <RelativeLayout
+        android:layout_width="296dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="0dp"
+        android:background="#4489ca"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="260dp"
+            android:layout_height="129dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginLeft="0dp"
+            android:layout_marginTop="0dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginBottom="20dp"
+            android:orientation="vertical"
+            tools:ignore="RtlHardcoded,UselessParent,TextSizeCheck">
+
+            <TextView
+                android:id="@+id/textView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="25dp"
+                android:fontFamily="@font/archivo_black"
+                android:text="¿Está seguro que quiere cerrar sesión?"
+                android:textAlignment="center"
+                android:textColor="@color/black"
+                tools:ignore="HardcodedText" />
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/id_si"
+                    android:layout_width="100dp"
+                    android:layout_height="50dp"
+                    android:backgroundTint="#2fb0c6"
+                    android:text="Si"
+                    tools:ignore="ButtonStyle,HardcodedText,TextContrastCheck" />
+
+                <Button
+                    android:id="@+id/id_no"
+                    android:layout_width="100dp"
+                    android:layout_height="50dp"
+                    android:layout_marginLeft="15dp"
+                    android:backgroundTint="#2fb0c6"
+                    android:text="No"
+                    tools:ignore="ButtonStyle,HardcodedText,TextContrastCheck" />
+            </LinearLayout>
+        </LinearLayout>
+    </RelativeLayout>
+
+</LinearLayout>

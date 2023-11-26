@@ -45,18 +45,6 @@
         app:layout_constraintTop_toTopOf="@+id/imageView2"
         tools:ignore="TextContrastCheck" />
 
-    <ImageButton
-        android:id="@+id/atras_b"
-        android:layout_width="48dp"
-        android:layout_height="45dp"
-        app:layout_constraintBottom_toBottomOf="@+id/imageView4"
-        app:layout_constraintEnd_toStartOf="@+id/textView4"
-        app:layout_constraintStart_toStartOf="@+id/imageView4"
-        app:layout_constraintTop_toTopOf="@+id/imageView2"
-        app:srcCompat="@drawable/android_arrow_back_icon_icons_com_50546"
-        tools:ignore="ContentDescription,SpeakableTextPresentCheck,TouchTargetSizeCheck"
-        android:background="@null"/>
-
     <androidx.core.widget.NestedScrollView
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -73,7 +61,7 @@
                 android:id="@+id/statusPieChart"
                 android:layout_width="380dp"
                 android:layout_height="350dp"
-                android:layout_marginTop="32dp"
+                android:layout_marginTop="60dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.516"
                 app:layout_constraintStart_toStartOf="parent"
@@ -93,10 +81,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Descarga"
-                app:layout_constraintBottom_toTopOf="@+id/collectionTimeLineChart"
+                android:backgroundTint="#2fb0c6"
+                app:cornerRadius="10dp"
+                app:layout_constraintBottom_toTopOf="@+id/statusPieChart"
                 app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.95"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/statusPieChart"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.166"
                 tools:ignore="HardcodedText" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>

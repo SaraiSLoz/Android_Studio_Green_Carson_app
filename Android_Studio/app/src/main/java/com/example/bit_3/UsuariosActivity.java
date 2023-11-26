@@ -48,7 +48,7 @@ import java.util.Comparator;
 
 
 public class UsuariosActivity extends AppCompatActivity {
-    ImageButton atras;
+
     private BarChart barChart;
 
     private PieChart pieChart;
@@ -76,15 +76,6 @@ public class UsuariosActivity extends AppCompatActivity {
         loadDataFromFirestore();
         loadStatusDataFromFirestore();
 
-        // Button to go back
-        atras = findViewById(R.id.atras_b);
-        atras.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(UsuariosActivity.this, MenuActivity.class);
-                startActivity(intent);
-            }
-        });
     }
 
     private void setupChart() {
