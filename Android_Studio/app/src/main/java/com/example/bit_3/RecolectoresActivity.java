@@ -230,19 +230,6 @@ public class RecolectoresActivity extends AppCompatActivity {
             }
         });
 
-
-
-        atras = findViewById(R.id.atras_b);
-
-        atras.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(RecolectoresActivity.this, MenuActivity.class);
-                startActivity(intent);
-            }
-        });
-
-
     }
 
     private void mostrarAlertDialog() {

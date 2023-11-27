@@ -112,15 +112,6 @@ public class CentrosActivity extends AppCompatActivity {
         // Load data from Firestore
         loadCentersData();
 
-        atras = findViewById(R.id.atras_b);
-
-        atras.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(CentrosActivity.this, MenuActivity.class);
-                startActivity(intent);
-            }
-        });
     }
 
     private void loadCentersData() {

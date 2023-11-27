@@ -113,14 +113,6 @@ public class ResiduosActivity extends AppCompatActivity {
         entries = new ArrayList<>(); // Inicializa la lista de entradas
         labels = new ArrayList<>(); // Inicializa la lista de etiquetas
 
-        atras = findViewById(R.id.atras_b);
-        atras.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(ResiduosActivity.this, MenuActivity.class);
-                startActivity(intent);
-            }
-        });
     }
 
     private void setupChart() {
