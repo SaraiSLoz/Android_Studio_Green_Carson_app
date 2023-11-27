@@ -52,24 +52,24 @@ public class LoginActivity extends AppCompatActivity {
 
     }
 
-        private void loginUserWithEmailAndPassword (String email, String password){
-            mAuth.signInWithEmailAndPassword(email, password)
-                    .addOnCompleteListener(this, task -> {
-                        if (task.isSuccessful()) {
-                            // Inicio de sesión exitoso
-                            FirebaseUser user = mAuth.getCurrentUser();
-                            if (user != null) {
-                                // El usuario está autenticado, puedes pasar a la siguiente actividad o realizar otras acciones
-                                SharedPreferencesUtil.saveUserUidToSharedPreferences(this,email);
-                                Intent intent = new Intent(LoginActivity.this, MenuActivity.class);
-                                startActivity(intent);
-                            }
-                        } else {
-                            // Si el inicio de sesión falla, muestra un mensaje al usuario
-                            Toast.makeText(LoginActivity.this, "Inicio de sesión fallido", Toast.LENGTH_SHORT).show();
+    private void loginUserWithEmailAndPassword (String email, String password){
+        mAuth.signInWithEmailAndPassword(email, password)
+                .addOnCompleteListener(this, task -> {
+                    if (task.isSuccessful()) {
+                        // Inicio de sesión exitoso
+                        FirebaseUser user = mAuth.getCurrentUser();
+                        if (user != null) {
+                            // El usuario está autenticado, puedes pasar a la siguiente actividad o realizar otras acciones
+                            SharedPreferencesUtil.saveUserUidToSharedPreferences(this,email);
+                            Intent intent = new Intent(LoginActivity.this, MenuActivity.class);
+                            startActivity(intent);
                         }
-                    });
-
-        }
+                    } else {
+                        // Si el inicio de sesión falla, muestra un mensaje al usuario
+                        Toast.makeText(LoginActivity.this, "Inicio de sesión fallido", Toast.LENGTH_SHORT).show();
+                    }
+                });
 
     }
+
+}

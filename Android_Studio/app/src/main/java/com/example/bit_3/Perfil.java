@@ -75,7 +75,7 @@ public class Perfil extends AppCompatActivity {
         });
 
 
-}
+    }
     private void mostrarAlertDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
@@ -99,4 +99,3 @@ public class Perfil extends AppCompatActivity {
         alertDialog.show();
     }
 }
-

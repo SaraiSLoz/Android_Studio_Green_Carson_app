@@ -48,7 +48,7 @@ import java.util.Comparator;
 
 
 public class UsuariosActivity extends AppCompatActivity {
-
+    ImageButton atras;
     private BarChart barChart;
 
     private PieChart pieChart;
@@ -76,6 +76,15 @@ public class UsuariosActivity extends AppCompatActivity {
         loadDataFromFirestore();
         loadStatusDataFromFirestore();
 
+        // Button to go back
+        atras = findViewById(R.id.atras_b);
+        atras.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(UsuariosActivity.this, MenuActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 
     private void setupChart() {
@@ -270,10 +279,10 @@ public class UsuariosActivity extends AppCompatActivity {
 
     private void updatePieChart(int activeCount, int inactiveCount) {
         ArrayList<PieEntry> entries = new ArrayList<>();
-        entries.add(new PieEntry(activeCount, "Active"));
-        entries.add(new PieEntry(inactiveCount, "Inactive"));
+        entries.add(new PieEntry(activeCount, "Activo"));
+        entries.add(new PieEntry(inactiveCount, "Inactivo"));
 
-        PieDataSet dataSet = new PieDataSet(entries, "User Status");
+        PieDataSet dataSet = new PieDataSet(entries, "");
         dataSet.setColors(ColorTemplate.COLORFUL_COLORS); // or use your own color array
         dataSet.setValueTextColor(Color.WHITE);
         dataSet.setValueTextSize(12f);

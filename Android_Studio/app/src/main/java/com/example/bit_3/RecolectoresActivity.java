@@ -6,59 +6,91 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
 import android.graphics.Typeface;
-import android.graphics.drawable.GradientDrawable;
 import android.graphics.pdf.PdfDocument;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.Handler;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.Toast;
 
-import androidx.annotation.Nullable;
+import android.graphics.Color;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.ImageButton;
+
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import android.util.Log;
+import androidx.annotation.Nullable;
+import android.animation.ValueAnimator;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.LinearGradient;
+import android.graphics.Shader;
+import android.graphics.Paint;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
+import android.os.Handler;
+import android.widget.TextView;
+import android.widget.Toast;
 
-import com.github.mikephil.charting.animation.Easing;
-import com.github.mikephil.charting.charts.LineChart;
-import com.github.mikephil.charting.charts.PieChart;
-import com.github.mikephil.charting.components.Legend;
+
+import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.data.BarData;
+import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
-import com.github.mikephil.charting.data.Entry;
-import com.github.mikephil.charting.data.LineData;
-import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
+import com.github.mikephil.charting.utils.ColorTemplate;
+import com.github.mikephil.charting.components.YAxis;
+import com.github.mikephil.charting.formatter.ValueFormatter;
+import com.github.mikephil.charting.components.Legend;
+import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
+import com.github.mikephil.charting.utils.ColorTemplate;
+import com.github.mikephil.charting.animation.Easing;
+import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.LineData;
+import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.utils.ColorTemplate;
 import com.github.mikephil.charting.formatter.ValueFormatter;
+import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.components.YAxis;
+import com.github.mikephil.charting.components.Legend;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
+
 import com.google.firebase.firestore.EventListener;
-import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Locale;
+
+
+import androidx.appcompat.app.AppCompatActivity;
 
 abstract class PdfChartGenerator extends Context {
 
     // Esta función genera un PDF a partir de un gráfico
-
     @SuppressLint("NewApi")
     public static void generatePdfFromChart(Context context, LineChart chart, PieChart pie, String pdfFileName) {
         // Crea un documento PDF
@@ -92,10 +124,22 @@ abstract class PdfChartGenerator extends Context {
         // Cierra el documento
         pdfDocument.close();
 
-        // Muestra un mensaje al usuario
-        Toast.makeText(context, "PDF generado correctamente", Toast.LENGTH_SHORT).show();
+        mostrarAlertDialog(context);
     }
 
+    private static void mostrarAlertDialog(Context context) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+
+        builder.setTitle("Documento descargado con éxito")
+                .setMessage("El pdf fue guardado con éxito en Descargas")
+                .setPositiveButton("Entendido", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss(); // Cierra el diálogo
+                    }
+                });
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+    }
     private static Bitmap getPieBitMap(PieChart pie) {
         pie.setDrawingCacheEnabled(true);
         pie.buildDrawingCache(true);
@@ -132,23 +176,15 @@ abstract class PdfChartGenerator extends Context {
             Toast.makeText(context, "Error al guardar el PDF", Toast.LENGTH_SHORT).show();
         }
     }
-    private void mostrarAlertDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
-        builder.setTitle("Documento descargado con éxito")
-                .setMessage("El pdf fue generado y guardado exitosamente")
-                .setPositiveButton("Entendido", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss(); // Cierra el diálogo
-                    }
-                });
-        AlertDialog alertDialog = builder.create();
-        alertDialog.show();
-    }
 }
+
+
 public class RecolectoresActivity extends AppCompatActivity {
 
     Button descargarPDFButton;
+
+    ImageButton atras;
     private LineChart collectionTimeLineChart;
 
     private PieChart pieChart;
@@ -159,7 +195,11 @@ public class RecolectoresActivity extends AppCompatActivity {
     private FirebaseFirestore db;
     private List<BarEntry> entries; // And this line
 
+    private TextView activeCollectorsTextView;
+    private TextView totalCollectorsTextView;
+
     @RequiresApi(api = Build.VERSION_CODES.O)
+
     @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -175,6 +215,12 @@ public class RecolectoresActivity extends AppCompatActivity {
         loadCollectionTimesDataFromFirestore();
         loadStatusDataFromFirestore();
 
+        // Initialize TextViews
+        activeCollectorsTextView = findViewById(R.id.activeCollectors); // Replace with your actual TextView ID
+        totalCollectorsTextView = findViewById(R.id.totalCollectors); // Replace with your actual TextView ID
+
+        // Load data from Firestore
+        loadCollectorsData();
 
         descargarPDFButton = findViewById(R.id.descargarPDFButton);
         descargarPDFButton.setOnClickListener(new View.OnClickListener() {
@@ -183,11 +229,76 @@ public class RecolectoresActivity extends AppCompatActivity {
                 descargarPDF();
             }
         });
+
+
+
+        atras = findViewById(R.id.atras_b);
+
+        atras.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(RecolectoresActivity.this, MenuActivity.class);
+                startActivity(intent);
+            }
+        });
+
+
+    }
+
+    private void mostrarAlertDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        builder.setTitle("Documento descargado")
+                .setMessage("El pdf fue generado")
+                .setPositiveButton("Entendido", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss(); // Cierra el diálogo
+                    }
+                });
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
     }
     @SuppressLint("NewApi")
     private void descargarPDF() {
         PdfChartGenerator.generatePdfFromChart(this, collectionTimeLineChart, pieChart, "graficas5");
-        Toast.makeText(this, "PDF generado correctamente y guardado", Toast.LENGTH_SHORT).show();
+        mostrarAlertDialog();
+    }
+
+    private void loadCollectorsData() {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        db.collection("recolectores")
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable QuerySnapshot snapshots,
+                                        @Nullable FirebaseFirestoreException e) {
+                        if (e != null) {
+                            Log.w("RecolectoresActivity", "Listen failed.", e);
+                            return;
+                        }
+
+                        int activeCount = 0;
+                        int totalCount = 0;
+                        if (snapshots != null) {
+                            for (QueryDocumentSnapshot doc : snapshots) {
+                                totalCount++;
+                                Long status = doc.getLong("status");
+                                if (status != null && status == 1) {
+                                    activeCount++;
+                                }
+                            }
+                            updateCollectorsCount(activeCount, totalCount);
+                        }
+                    }
+                });
+    }
+
+    private void updateCollectorsCount(int active, int total) {
+        // Update the text views on the main thread
+        runOnUiThread(() -> {
+            activeCollectorsTextView.setText(String.valueOf(active));
+            totalCollectorsTextView.setText(String.valueOf(total));
+        });
     }
 
     private void setupPieChart() {
@@ -260,7 +371,6 @@ public class RecolectoresActivity extends AppCompatActivity {
 
     private void loadCollectionTimesDataFromFirestore() {
         db.collection("recolecciones").addSnapshotListener(new EventListener<QuerySnapshot>() {
-            @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public void onEvent(@Nullable QuerySnapshot snapshots,
                                 @Nullable FirebaseFirestoreException e) {
@@ -288,10 +398,10 @@ public class RecolectoresActivity extends AppCompatActivity {
 
     private void updatePieChart(int activeCount, int inactiveCount) {
         ArrayList<PieEntry> entries = new ArrayList<>();
-        entries.add(new PieEntry(activeCount, "Active"));
-        entries.add(new PieEntry(inactiveCount, "Inactive"));
+        entries.add(new PieEntry(activeCount, "Activo"));
+        entries.add(new PieEntry(inactiveCount, "Inactivo"));
 
-        PieDataSet dataSet = new PieDataSet(entries, "User Status");
+        PieDataSet dataSet = new PieDataSet(entries, "");
         int[] colors = new int[]{Color.rgb(67, 160, 71), Color.rgb(239, 83, 80)}; // RGB values for green and red
         dataSet.setColors(colors); // Apply the custom colors
         dataSet.setValueTextColor(Color.WHITE);
@@ -299,7 +409,6 @@ public class RecolectoresActivity extends AppCompatActivity {
 
         // Set the value formatter to display values as percentages
         dataSet.setValueFormatter(new ValueFormatter() {
-            @SuppressLint("DefaultLocale")
             @Override
             public String getFormattedValue(float value) {
                 // Assuming 'value' is already calculated as a percentage
@@ -321,8 +430,6 @@ public class RecolectoresActivity extends AppCompatActivity {
         pieChart.invalidate(); // Refresh the chart
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
-    @SuppressLint("ObsoleteSdkInt")
     private void updateLineChart(Map<Integer, Integer> collectionTimes) {
         List<Entry> entries = new ArrayList<>();
 
@@ -347,9 +454,9 @@ public class RecolectoresActivity extends AppCompatActivity {
         dataSet.setMode(LineDataSet.Mode.CUBIC_BEZIER);
         dataSet.setDrawFilled(true);
 
-        // Define the gradient
+
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN_MR2) {
-            // As the chart may not have been laid out yet, we need to get its height in a layout pass
+
             new Handler().post(() -> {
                 int height = collectionTimeLineChart.getHeight();
                 GradientDrawable gradientDrawable = new GradientDrawable(
