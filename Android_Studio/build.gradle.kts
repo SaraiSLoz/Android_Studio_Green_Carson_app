@@ -8,21 +8,16 @@ plugins {
 buildscript {
     repositories{
         google()
-        //noinspection JcenterRepositoryObsolete
-        @Suppress("DEPRECATION")
-        //noinspection JcenterRepositoryObsolete
         jcenter()
     }
     dependencies {
-        classpath ("com.android.tools.build:gradle:7.0.4")
+        classpath ("com.android.tools.build:gradle:7.0.0")
     }
 }
 
 allprojects {
     repositories {
         google()
-        @Suppress("DEPRECATION")
-        //noinspection JcenterRepositoryObsolete
         jcenter()
         maven { url = uri("https://jitpack.io") }
     }
