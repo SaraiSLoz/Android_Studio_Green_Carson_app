@@ -129,26 +129,37 @@ public class ResiduosActivity extends AppCompatActivity {
         horizontalBarChart.getDescription().setEnabled(false);
 
         Legend legend = horizontalBarChart.getLegend();
-        legend.setEnabled(false); // This will hide the legend
+        legend.setEnabled(false);
 
-        YAxis rightYAxis = horizontalBarChart.getAxisRight();
-        rightYAxis.setDrawAxisLine(true);
-        rightYAxis.setDrawGridLines(false);
-        rightYAxis.setDrawLabels(true);
+        XAxis xAxis = horizontalBarChart.getXAxis();
+        xAxis.setDrawLabels(false);
+        xAxis.setDrawAxisLine(false);
+        xAxis.setDrawGridLines(false);
 
-        rightYAxis.setValueFormatter(new ValueFormatter() {
+        ValueFormatter integerFormatter = new ValueFormatter() {
             @Override
             public String getFormattedValue(float value) {
-                int index = (int) value;
-                if (index >= 0 && index < labels.size()) {
-                    return labels.get(index);
-                }
-                return "";
+                // Format the value as an integer, removing the ".0" part
+                return String.valueOf((int) value);
             }
-        });
+        };
 
-        // Other chart setup code...
+        YAxis leftYAxis = horizontalBarChart.getAxisLeft();
+        leftYAxis.setDrawLabels(true);
+        leftYAxis.setDrawAxisLine(true);
+        leftYAxis.setDrawGridLines(true);
+        leftYAxis.setValueFormatter(integerFormatter);
+
+        YAxis rightYAxis = horizontalBarChart.getAxisRight();
+        rightYAxis.setDrawLabels(true);
+        rightYAxis.setDrawAxisLine(true);
+        rightYAxis.setDrawGridLines(true);
+        rightYAxis.setValueFormatter(integerFormatter);
+
+        // Refresh the chart to apply changes
+        horizontalBarChart.invalidate();
     }
+
 
 
 
@@ -166,9 +177,11 @@ public class ResiduosActivity extends AppCompatActivity {
                         Map<String, Integer> materialCounts = new HashMap<>();
                         for (QueryDocumentSnapshot document : task.getResult()) {
                             String fechaRecoleccion = document.getString("fechaRecoleccion");
+                            String estado = document.getString("estado"); // Get the state of the collection
                             try {
                                 Date recoleccionDate = sdf.parse(fechaRecoleccion);
-                                if (recoleccionDate != null && !recoleccionDate.before(thirtyDaysAgo)) {
+                                // Check if the recoleccionDate is within the last 30 days and the state is "Completada"
+                                if (recoleccionDate != null && !recoleccionDate.before(thirtyDaysAgo) && "Completada".equals(estado)) {
                                     Map<String, Object> materials = (Map<String, Object>) document.get("materiales");
                                     if (materials != null) {
                                         for (Object materialObj : materials.values()) {
@@ -199,6 +212,7 @@ public class ResiduosActivity extends AppCompatActivity {
                     }
                 });
     }
+
 
 
 
@@ -238,13 +252,7 @@ public class ResiduosActivity extends AppCompatActivity {
         BarData data = new BarData(dataSet);
         horizontalBarChart.setData(data);
 
-        YAxis rightAxis = horizontalBarChart.getAxisRight();
-        rightAxis.setDrawLabels(true);
-        rightAxis.setValueFormatter(new IndexAxisValueFormatter(labels));
-        rightAxis.setGranularity(1f); // Set granularity to one to avoid skipping labels
-        rightAxis.setGranularityEnabled(true); // Enable granularity
 
-        rightAxis.setLabelCount(labels.size(), false); // Ensure all labels are shown
 
         horizontalBarChart.notifyDataSetChanged();
         horizontalBarChart.invalidate(); // Refresh the chart
