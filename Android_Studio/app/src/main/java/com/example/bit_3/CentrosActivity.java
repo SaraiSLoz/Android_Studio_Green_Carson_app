@@ -1,15 +1,27 @@
 package com.example.bit_3;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Typeface;
+import android.graphics.pdf.PdfDocument;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageButton;
 
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageButton;
+
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 import androidx.annotation.Nullable;
@@ -23,8 +35,7 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Handler;
 import android.widget.TextView;
-
-
+import android.widget.Toast;
 
 
 import com.github.mikephil.charting.charts.BarChart;
@@ -61,7 +72,12 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -74,9 +90,144 @@ import java.util.Locale;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+abstract class PdfChartGeneratorCentros extends Context {
+
+    // Esta función genera un PDF a partir de un gráfico
+    @SuppressLint("NewApi")
+    public static void generatePdfFromChart(Context context, PieChart pie, String tx1, String tx2, String pdfFileName) {
+        // Crea un documento PDF
+        PdfDocument pdfDocument = new PdfDocument();
+
+        // Configura el tamaño de la página
+        int width = 612; //612 y 792
+        int height = 792;
+
+        // Configura la página
+        PdfDocument.PageInfo pageInfo = new PdfDocument.PageInfo.Builder(width, height, 2).create();
+        PdfDocument.Page page = pdfDocument.startPage(pageInfo);
+        float scalePercent = 30f;
+
+        Paint paint = new Paint();
+        paint.setColor(Color.BLACK);
+        paint.setTextSize(15f);
+        paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
+        Paint paint2 = new Paint();
+        paint2.setColor(Color.BLACK);
+        paint2.setTextSize(8f);
+        // Dibuja el contenido del gráfico en la página
+        Canvas canvas = page.getCanvas();
+
+        Bitmap scaledPieBitmap = scalePie(pie, scalePercent);
+        canvas.drawText("Número de centros en servicio: ",50, 60 ,paint);
+        canvas.drawText(tx1,50, 70 ,paint);
+        canvas.drawText("Centros Totales: ",50, 90 ,paint);
+        canvas.drawText(tx2,50, 100 ,paint);
+        canvas.drawText("Estado de los Centros: ",290, 150,paint);
+        canvas.drawBitmap(scaledPieBitmap, 150, 160, null);
+        // Añadir hora actual al PDF
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
+        canvas.drawText("Fecha de creación: " + timeStamp, 100, height - 20, paint2);
+        // Finaliza la página
+        pdfDocument.finishPage(page);
+
+        // Guarda el documento en un archivo PDF
+        savePdf(context, pdfDocument, pdfFileName);
+
+        // Cierra el documento
+        pdfDocument.close();
+
+        mostrarAlertDialog(context);
+    }
+
+    private static void mostrarAlertDialog(Context context) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+
+        builder.setTitle("Documento descargado con éxito")
+                .setMessage("El pdf fue guardado con éxito en Descargas")
+                .setPositiveButton("Entendido", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss(); // Cierra el diálogo
+                    }
+                });
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+    }
+    public static Bitmap scaleChart(LineChart chart, float scalePercent) {
+        // Convierte la gráfica a un mapa de bits
+        Bitmap chartBitmap = getChartBitmap(chart);
+
+        // Obtiene las dimensiones originales
+        int originalWidth = chartBitmap.getWidth();
+        int originalHeight = chartBitmap.getHeight();
+
+        // Calcula las nuevas dimensiones después de escalar
+        int newWidth = (int) (originalWidth * scalePercent / 100);
+        int newHeight = (int) (originalHeight * scalePercent / 100);
+
+        // Escala el mapa de bits
+        Bitmap scaledChartBitmap = Bitmap.createScaledBitmap(chartBitmap, newWidth, newHeight, true);
+
+        return scaledChartBitmap;
+    }
+    public static Bitmap scalePie(PieChart chart, float scalePercent) {
+        // Convierte la gráfica a un mapa de bits
+        Bitmap chartBitmap = getPieBitMap(chart);
+
+        // Obtiene las dimensiones originales
+        int originalWidth = chartBitmap.getWidth();
+        int originalHeight = chartBitmap.getHeight();
+
+        // Calcula las nuevas dimensiones después de escalar
+        int newWidth = (int) (originalWidth * scalePercent / 100);
+        int newHeight = (int) (originalHeight * scalePercent / 100);
+
+        // Escala el mapa de bits
+        Bitmap scaledChartBitmap = Bitmap.createScaledBitmap(chartBitmap, newWidth, newHeight, true);
+
+        return scaledChartBitmap;
+    }
+
+    private static Bitmap getPieBitMap(PieChart pie) {
+        pie.setDrawingCacheEnabled(true);
+        pie.buildDrawingCache(true);
+        Bitmap bitmap = Bitmap.createBitmap(pie.getDrawingCache());
+        pie.setDrawingCacheEnabled(false);
+        return bitmap;
+    }
+
+
+    // Esta función convierte el gráfico a un mapa de bits para su posterior uso en el PDF
+    private static Bitmap getChartBitmap(LineChart chart) {
+        chart.setDrawingCacheEnabled(true);
+        chart.buildDrawingCache(true);
+        Bitmap bitmap = Bitmap.createBitmap(chart.getDrawingCache());
+        chart.setDrawingCacheEnabled(false);
+        return bitmap;
+    }
+
+    // Esta función guarda el documento PDF en el almacenamiento externo
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    private static void savePdf(Context context, PdfDocument pdfDocument, String pdfFileName) {
+        File directory = new File(Environment.getExternalStorageDirectory(), "Download");
+
+        if (!directory.exists()) {
+            directory.mkdirs();
+        }
+
+        File file = new File(directory, pdfFileName + ".pdf");
+
+        try {
+            pdfDocument.writeTo(Files.newOutputStream(file.toPath()));
+        } catch (IOException e) {
+            e.printStackTrace();
+            Toast.makeText(context, "Error al guardar el PDF", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+}
 public class CentrosActivity extends AppCompatActivity {
 
-    ImageButton atras;
+    Button descarga;
     private LineChart collectionTimeLineChart;
 
     private PieChart pieChart;
@@ -89,6 +240,8 @@ public class CentrosActivity extends AppCompatActivity {
 
     private TextView activeCentersTextView;
     private TextView totalCentersTextView;
+    String text1,text2;
+    CharSequence text_c, text1_c;
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -112,7 +265,36 @@ public class CentrosActivity extends AppCompatActivity {
         // Load data from Firestore
         loadCentersData();
 
+        descarga = findViewById(R.id.descarga_b);
+        descarga.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                descargarPDF();
+            }
+        });
+
     }
+
+    private void mostrarAlertDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        builder.setTitle("Documento descargado")
+                .setMessage("El pdf fue generado")
+                .setPositiveButton("Entendido", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss(); // Cierra el diálogo
+                    }
+                });
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+    }
+    @SuppressLint("NewApi")
+    private void descargarPDF() {
+
+        PdfChartGeneratorCentros.generatePdfFromChart(this, pieChart, text1, text2, "grafica_centros");
+        mostrarAlertDialog();
+    }
+
 
     private void loadCentersData() {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -150,6 +332,10 @@ public class CentrosActivity extends AppCompatActivity {
         runOnUiThread(() -> {
             activeCentersTextView.setText(String.valueOf(active));
             totalCentersTextView.setText(String.valueOf(total));
+            text_c = activeCentersTextView.getText();
+            text1 = text_c.toString();
+            text1_c = totalCentersTextView.getText();
+            text2 = text1_c.toString();
         });
     }
 
