@@ -86,6 +86,8 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.text.ParseException;
+import java.util.TreeMap;
+
 
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -113,27 +115,39 @@ public class ResiduosActivity extends AppCompatActivity {
         entries = new ArrayList<>(); // Inicializa la lista de entradas
         labels = new ArrayList<>(); // Inicializa la lista de etiquetas
 
+        atras = findViewById(R.id.atras_b);
+        atras.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(ResiduosActivity.this, MenuActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 
     private void setupChart() {
         horizontalBarChart.getDescription().setEnabled(false);
 
+        Legend legend = horizontalBarChart.getLegend();
+        legend.setEnabled(false); // This will hide the legend
+
         YAxis rightYAxis = horizontalBarChart.getAxisRight();
-        rightYAxis.setDrawAxisLine(true); // Dibuja la línea del eje Y derecho
-        rightYAxis.setDrawGridLines(false); // No dibuja las líneas de cuadrícula
-        rightYAxis.setDrawLabels(true); // Habilita las etiquetas (nombres de los materiales)
+        rightYAxis.setDrawAxisLine(true);
+        rightYAxis.setDrawGridLines(false);
+        rightYAxis.setDrawLabels(true);
 
         rightYAxis.setValueFormatter(new ValueFormatter() {
             @Override
             public String getFormattedValue(float value) {
                 int index = (int) value;
                 if (index >= 0 && index < labels.size()) {
-                    return labels.get(index); // Retorna el nombre del material correspondiente
+                    return labels.get(index);
                 }
-                return ""; // Para índices que no corresponden a un label
+                return "";
             }
         });
 
+        // Other chart setup code...
     }
 
 
@@ -148,7 +162,7 @@ public class ResiduosActivity extends AppCompatActivity {
         db.collection("recolecciones")
                 .get()
                 .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
+                    if (task.isSuccessful() && task.getResult() != null) {
                         Map<String, Integer> materialCounts = new HashMap<>();
                         for (QueryDocumentSnapshot document : task.getResult()) {
                             String fechaRecoleccion = document.getString("fechaRecoleccion");
@@ -157,13 +171,13 @@ public class ResiduosActivity extends AppCompatActivity {
                                 if (recoleccionDate != null && !recoleccionDate.before(thirtyDaysAgo)) {
                                     Map<String, Object> materials = (Map<String, Object>) document.get("materiales");
                                     if (materials != null) {
-                                        for (Object value : materials.values()) {
-                                            if (value instanceof Map) {
-                                                Map<String, Object> material = (Map<String, Object>) value;
+                                        for (Object materialObj : materials.values()) {
+                                            if (materialObj instanceof Map) {
+                                                Map<String, Object> material = (Map<String, Object>) materialObj;
                                                 String materialName = (String) material.get("nombre");
                                                 Long count = (Long) material.get("cantidad");
                                                 if (materialName != null && count != null) {
-                                                    materialCounts.put(materialName, materialCounts.getOrDefault(materialName, 0) + count.intValue());
+                                                    materialCounts.merge(materialName, count.intValue(), Integer::sum);
                                                 }
                                             }
                                         }
@@ -173,6 +187,12 @@ public class ResiduosActivity extends AppCompatActivity {
                                 Log.e("ResiduosActivity", "Error parsing date", e);
                             }
                         }
+
+                        // Log the materials and their counts
+                        for (Map.Entry<String, Integer> entry : materialCounts.entrySet()) {
+                            Log.d("MaterialCount", "Material: " + entry.getKey() + ", Count: " + entry.getValue());
+                        }
+
                         updateChart(materialCounts);
                     } else {
                         Log.d("ResiduosActivity", "Error getting documents: ", task.getException());
@@ -184,28 +204,36 @@ public class ResiduosActivity extends AppCompatActivity {
 
 
     private void updateChart(Map<String, Integer> materialCounts) {
-        List<BarEntry> entries = new ArrayList<>();
-        labels = new ArrayList<>();
+        // Convert the materialCounts map to a list of entries
+        List<Map.Entry<String, Integer>> materialEntries = new ArrayList<>(materialCounts.entrySet());
 
-        // Convertir el mapa a una lista para poder ordenarla
-        List<Map.Entry<String, Integer>> list = new ArrayList<>(materialCounts.entrySet());
-
-        // Ordenar alfabéticamente por la clave (nombre del material)
-        Collections.sort(list, new Comparator<Map.Entry<String, Integer>>() {
+        // Sort the entries alphabetically by key (material name)
+        Collections.sort(materialEntries, new Comparator<Map.Entry<String, Integer>>() {
             @Override
             public int compare(Map.Entry<String, Integer> o1, Map.Entry<String, Integer> o2) {
                 return o1.getKey().compareTo(o2.getKey());
             }
         });
 
-        // Crear los datos del gráfico con las entradas ordenadas
-        for (int i = 0; i < list.size(); i++) {
-            entries.add(new BarEntry(i, list.get(i).getValue()));
-            labels.add(list.get(i).getKey());
+        // Log the sorted material names and their counts
+        for (Map.Entry<String, Integer> entry : materialEntries) {
+            Log.d("SortedMaterialEntry", "Material: " + entry.getKey() + ", Count: " + entry.getValue());
         }
 
-        BarDataSet dataSet = new BarDataSet(entries, "");
-        dataSet.setColors(ColorTemplate.MATERIAL_COLORS); // Asigna colores múltiples
+        // Create the chart entries and labels based on the sorted entries
+        List<BarEntry> chartEntries = new ArrayList<>();
+        labels = new ArrayList<>(); // Reset labels to match the sorted order
+        int maxIndex = materialEntries.size() - 1;
+        for (int i = 0; i <= maxIndex; i++) {
+            // Invert the index for the bar entry
+            int invertedIndex = maxIndex - i;
+            Map.Entry<String, Integer> entry = materialEntries.get(i);
+            chartEntries.add(new BarEntry(invertedIndex, entry.getValue()));
+            labels.add(entry.getKey());
+        }
+
+        BarDataSet dataSet = new BarDataSet(chartEntries, "Material Counts");
+        dataSet.setColors(ColorTemplate.MATERIAL_COLORS);
 
         BarData data = new BarData(dataSet);
         horizontalBarChart.setData(data);
@@ -213,14 +241,17 @@ public class ResiduosActivity extends AppCompatActivity {
         YAxis rightAxis = horizontalBarChart.getAxisRight();
         rightAxis.setDrawLabels(true);
         rightAxis.setValueFormatter(new IndexAxisValueFormatter(labels));
+        rightAxis.setGranularity(1f); // Set granularity to one to avoid skipping labels
+        rightAxis.setGranularityEnabled(true); // Enable granularity
 
-        // Importante: Asegúrate de que el eje Y derecho muestre las etiquetas para cada entrada
-        rightAxis.setLabelCount(labels.size(), false);
+        rightAxis.setLabelCount(labels.size(), false); // Ensure all labels are shown
 
-        horizontalBarChart.invalidate();
-
-
+        horizontalBarChart.notifyDataSetChanged();
+        horizontalBarChart.invalidate(); // Refresh the chart
     }
+
+
+
 
 
 
