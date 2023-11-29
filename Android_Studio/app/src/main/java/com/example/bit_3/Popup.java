@@ -22,20 +22,21 @@ public class Popup extends AppCompatActivity {
     Button aceptar;
     EditText actual, nuevo;
 
-    String actual_s,nuevo_s;
+    String actual_s,nuevo_s, correo ;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.popup);
-
+        correo = SharedPreferencesUtil.getUserUidFromSharedPreferences(this);
         aceptar = findViewById(R.id.aceptar_b);
         actual = findViewById(R.id.contrs_actual);
         nuevo = findViewById(R.id.contra_nueva);
-        actual_s = actual.getText().toString().trim();
-        nuevo_s =nuevo.getText().toString().trim();
+
         aceptar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                actual_s = actual.getText().toString().trim();
+                nuevo_s =nuevo.getText().toString().trim();
                 cambiar_contrasena(actual_s,nuevo_s);
             }
         });
@@ -58,7 +59,7 @@ public class Popup extends AppCompatActivity {
         alertDialog.show();
     }
     private void cambiar_contrasena(String actual, String nuevo) {
-        AuthCredential credential = EmailAuthProvider.getCredential(user.getEmail(), actual);
+        AuthCredential credential = EmailAuthProvider.getCredential(correo, actual);
         user.reauthenticate(credential)
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
@@ -74,6 +75,8 @@ public class Popup extends AppCompatActivity {
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         mostrarAlertDialog();
+                        Intent intent = new Intent(Popup.this, Perfil.class);
+                        startActivity(intent);
                     } else {
                         Toast.makeText(this, "Error al cambiar la contraseña.", Toast.LENGTH_SHORT).show();
                     }
