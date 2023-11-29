@@ -20,11 +20,11 @@ public class MenuActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.menu);
-        usuario = findViewById(R.id.Usuario_but);
-        recolectores = findViewById(R.id.Recolectores_but);
-        centros = findViewById(R.id.Centros_but);
-        residuos = findViewById(R.id.Residuos_but);
-        perfil = findViewById(R.id.perfil_b);
+        usuario.findViewById(R.id.Usuario_but);
+        recolectores.findViewById(R.id.Recolectores_but);
+        centros.findViewById(R.id.Centros_but);
+        residuos.findViewById(R.id.Residuos_but);
+        perfil.findViewById(R.id.perfil_b);
         userUid = SharedPreferencesUtil.getUserUidFromSharedPreferences(this);
         recolectores.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -61,21 +61,6 @@ public class MenuActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-    }
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        new AlertDialog.Builder(this)
-                .setTitle("Salir de la aplicación")
-                .setMessage("¿Estás seguro de que quieres salir?")
-                .setPositiveButton("Sí", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        finish();
-                    }
-                })
-                .setNegativeButton("No", null)
-                .show();
     }
 
 }

@@ -50,9 +50,7 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
-    }
-
-    private void loginUserWithEmailAndPassword (String email, String password){
+    }    private void loginUserWithEmailAndPassword (String email, String password){
         mAuth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, task -> {
                     if (task.isSuccessful()) {

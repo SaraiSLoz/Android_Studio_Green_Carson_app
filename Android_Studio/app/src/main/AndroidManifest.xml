@@ -40,6 +40,11 @@
             android:label="@string/title_activity_menu"
             android:theme="@style/Theme.Bit_3" />
         <activity
+            android:name=".Popup"
+            android:exported="false"
+            android:label ="Popup"
+            android:theme="@style/Theme.Bit_3" />
+        <activity
             android:name=".RecolectoresActivity"
             android:exported="false"
             android:label="RecolectoresActivity"
