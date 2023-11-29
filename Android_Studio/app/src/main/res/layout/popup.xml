@@ -6,7 +6,7 @@
     android:layout_height="fill_parent"
     android:orientation="vertical"
     android:background="@drawable/gc_app_pantallas_blanco"
-    tools:context=".Perfil"
+    tools:context=".Popup"
     >
 
 

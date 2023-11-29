@@ -31,33 +31,31 @@ import com.google.firebase.firestore.FirebaseFirestore;
 /** @noinspection ALL */
 public class Perfil extends AppCompatActivity {
 
-    private TextView correo, nombre;
-    private EditText actual, nuevo;
-    private String fieldValue, documentId;
-    private CollectionReference collectionRef;
-    private Button sesion, cambiar_contr, aceptar;
-    private FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private FirebaseAuth auth = FirebaseAuth.getInstance();
-    private FirebaseUser user = auth.getCurrentUser();
-    private AuthCredential credential;
-    private String userUid;
-    private ImageButton cerrar;
-
-
+    TextView correo, nombre;
+    EditText actual, nuevo;
+    String fieldValue, documentId;
+    CollectionReference collectionRef;
+    Button sesion, cambiar_contr, aceptar;
+    FirebaseFirestore db = FirebaseFirestore.getInstance();
+    FirebaseAuth auth = FirebaseAuth.getInstance();
+    FirebaseUser user = auth.getCurrentUser();
+    AuthCredential credential;
+    String userUid;
+    ImageButton cerrar;
 
     @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_perfil);
-        nombre.findViewById(R.id.nombre_t);
-        correo.findViewById(R.id.correo_t);
+        nombre = findViewById(R.id.nombre_t);
+        correo = findViewById(R.id.correo_t);
         userUid = SharedPreferencesUtil.getUserUidFromSharedPreferences(this);
         correo.setText(userUid);
         documentId = user.getUid();
         readSingleField(documentId);
-        sesion.findViewById(R.id.cerrar_sesion);
-        cambiar_contr.findViewById(R.id.contra);
+        sesion = findViewById(R.id.cerrar_sesion);
+        cambiar_contr = findViewById(R.id.contra);
 
         sesion.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -78,33 +76,6 @@ public class Perfil extends AppCompatActivity {
 
 
     }
-
-    private void cambiar_contrasena(String actual, String nuevo) {
-        credential = EmailAuthProvider.getCredential(user.getEmail(), actual);
-        user.reauthenticate(credential)
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        cambiarContraseñaNueva(nuevo);
-                    } else {
-                        Toast.makeText(this, "Error de autenticación. Verifica tu contraseña actual.", Toast.LENGTH_SHORT).show();
-                    }
-                });
-    }
-
-    private void cambiarContraseñaNueva(String nuevo) {
-        // Nueva contraseña
-        String nuevaContraseña = nuevo;
-
-        user.updatePassword(nuevaContraseña)
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        Toast.makeText(this, "Contraseña cambiada con éxito.", Toast.LENGTH_SHORT).show();
-                    } else {
-                        Toast.makeText(this, "Error al cambiar la contraseña.", Toast.LENGTH_SHORT).show();
-                    }
-                });
-    }
-
     private void mostrarAlertDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
 

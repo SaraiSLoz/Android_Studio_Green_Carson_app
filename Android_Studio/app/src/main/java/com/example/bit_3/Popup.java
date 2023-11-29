@@ -17,10 +17,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 public class Popup extends AppCompatActivity {
-    private FirebaseAuth auth = FirebaseAuth.getInstance();
+    FirebaseAuth auth = FirebaseAuth.getInstance();
     FirebaseUser user = auth.getCurrentUser();
-    AuthCredential credential;
-
     Button aceptar;
     EditText actual, nuevo;
 
@@ -30,9 +28,9 @@ public class Popup extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.popup);
 
-        aceptar.findViewById(R.id.aceptar_b);
-        actual.findViewById(R.id.contrs_actual);
-        nuevo.findViewById(R.id.contra_nueva);
+        aceptar = findViewById(R.id.aceptar_b);
+        actual = findViewById(R.id.contrs_actual);
+        nuevo = findViewById(R.id.contra_nueva);
         actual_s = actual.getText().toString().trim();
         nuevo_s =nuevo.getText().toString().trim();
         aceptar.setOnClickListener(new View.OnClickListener() {
@@ -60,7 +58,7 @@ public class Popup extends AppCompatActivity {
         alertDialog.show();
     }
     private void cambiar_contrasena(String actual, String nuevo) {
-        credential = EmailAuthProvider.getCredential(user.getEmail(), actual);
+        AuthCredential credential = EmailAuthProvider.getCredential(user.getEmail(), actual);
         user.reauthenticate(credential)
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
