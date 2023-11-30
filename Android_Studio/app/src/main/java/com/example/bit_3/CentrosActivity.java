@@ -66,6 +66,26 @@ import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 
+import com.github.mikephil.charting.charts.BarChart;
+import com.github.mikephil.charting.charts.PieChart;
+import com.github.mikephil.charting.components.Legend;
+import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.components.YAxis;
+import com.github.mikephil.charting.data.BarData;
+import com.github.mikephil.charting.data.BarDataSet;
+import com.github.mikephil.charting.data.BarEntry;
+import com.github.mikephil.charting.data.PieData;
+import com.github.mikephil.charting.data.PieDataSet;
+import com.github.mikephil.charting.data.PieEntry;
+import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
+import com.github.mikephil.charting.formatter.ValueFormatter;
+import com.github.mikephil.charting.utils.ColorTemplate;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -86,6 +106,7 @@ import java.util.Set;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Locale;
+import java.util.concurrent.atomic.AtomicInteger;
 
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -232,6 +253,10 @@ public class CentrosActivity extends AppCompatActivity {
 
     private PieChart pieChart;
 
+    private BarDataSet dataSet; // Add this line
+
+    BarChart barChart;
+
     private boolean isFirstLoad = true;
     private boolean isFirstLoad2 = true;
 
@@ -254,9 +279,11 @@ public class CentrosActivity extends AppCompatActivity {
         // Setup the chart
         //setupLineChart();
         setupPieChart();
+        setupChart();
         // Load data from Firestore
         //loadCollectionTimesDataFromFirestore();
         loadStatusDataFromFirestore();
+        loadDataBarChart();
 
         // Initialize TextViews
         activeCentersTextView = findViewById(R.id.activeCenters); // Replace with your actual TextView ID
@@ -420,6 +447,104 @@ public class CentrosActivity extends AppCompatActivity {
 
         pieChart.invalidate(); // Refresh the chart
     }
+
+    private void setupChart() {
+        barChart = findViewById(R.id.barChart);
+        barChart.getDescription().setEnabled(false);
+        barChart.setFitBars(true);
+
+        XAxis xAxis = barChart.getXAxis();
+        //xAxis.setValueFormatter(new IndexAxisValueFormatter(getAgeLabels()));
+        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+        xAxis.setDrawGridLines(false);
+
+        Legend legend = barChart.getLegend();
+        legend.setEnabled(true); // Enable the legend if you want to customize it
+        legend.setForm(Legend.LegendForm.NONE); // No form (shape), only text
+        legend.setTextSize(12f);
+        legend.setVerticalAlignment(Legend.LegendVerticalAlignment.BOTTOM);
+        legend.setHorizontalAlignment(Legend.LegendHorizontalAlignment.CENTER);
+        legend.setOrientation(Legend.LegendOrientation.HORIZONTAL);
+        legend.setDrawInside(false);
+        legend.setYOffset(5f); // Adjust the offset as needed
+    }
+
+
+    private void loadDataBarChart() {
+        db.collection("categorias").get().addOnCompleteListener(task -> {
+            if (task.isSuccessful() && task.getResult() != null) {
+                // Crear un mapa para almacenar el conteo de centros por categoría
+                Map<String, Integer> categoryCounts = new HashMap<>();
+                List<String> categoryNames = new ArrayList<>(); // Lista para guardar los nombres de las categorías
+                int totalCategories = task.getResult().size();
+                AtomicInteger processedCategories = new AtomicInteger(0);
+
+                // Recorrer los documentos de categorías
+                for (QueryDocumentSnapshot document : task.getResult()) {
+                    String categoryName = document.getId(); // Usar el ID del documento como nombre de la categoría
+                    categoryNames.add(categoryName); // Agregar a la lista de nombres de categorías
+
+                    // Ahora, para cada categoría, contar los centros asociados
+                    db.collection("centros").whereEqualTo("categoria", categoryName).get()
+                            .addOnCompleteListener(centrosTask -> {
+                                if (centrosTask.isSuccessful() && centrosTask.getResult() != null) {
+                                    // Agregar la cantidad de centros al mapa usando el ID del documento como clave
+                                    categoryCounts.put(categoryName, centrosTask.getResult().size());
+
+                                    // Comprobar si todas las categorías han sido procesadas
+                                    if (processedCategories.incrementAndGet() == totalCategories) {
+                                        updateChart(categoryCounts, categoryNames);
+                                    }
+                                }
+                            });
+                }
+            }
+        });
+    }
+
+    private void updateChart(Map<String, Integer> categoryCounts, List<String> categoryNames) {
+        List<BarEntry> chartEntries = new ArrayList<>();
+
+        int index = 0;
+        for (String categoryName : categoryNames) {
+            if (categoryCounts.containsKey(categoryName)) {
+                chartEntries.add(new BarEntry(index, categoryCounts.get(categoryName)));
+                index++;
+            }
+        }
+
+        BarDataSet barDataSet = new BarDataSet(chartEntries, ""); // Título en blanco
+        barDataSet.setColors(ColorTemplate.MATERIAL_COLORS);
+
+        BarData barData = new BarData(barDataSet);
+        barChart.setData(barData);
+
+        barChart.setExtraBottomOffset(10f); // Aumenta el margen inferior
+
+        XAxis xAxis = barChart.getXAxis();
+        xAxis.setLabelRotationAngle(90); // Rota las etiquetas en 90 grados
+        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+        xAxis.setDrawLabels(true);
+        xAxis.setGranularity(1f);
+        xAxis.setGranularityEnabled(true);
+
+        xAxis.setValueFormatter(new ValueFormatter() {
+            @Override
+            public String getFormattedValue(float value) {
+                String categoryName = categoryNames.get((int) value);
+                StringBuilder verticalLabel = new StringBuilder();
+                for (char c : categoryName.toCharArray()) {
+                    verticalLabel.append(c).append("\n");
+                }
+                return verticalLabel.toString().trim();
+            }
+        });
+
+        barChart.notifyDataSetChanged();
+        barChart.animateY(1000); // Animate the chart on the first load
+        barChart.invalidate(); // Refresca el gráfico
+    }
+
 
 
 
