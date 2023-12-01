@@ -61,6 +61,7 @@ public class LoginActivity extends AppCompatActivity {
                             SharedPreferencesUtil.saveUserUidToSharedPreferences(this,email);
                             Intent intent = new Intent(LoginActivity.this, MenuActivity.class);
                             startActivity(intent);
+                            finish();
                         }
                     } else {
                         // Si el inicio de sesión falla, muestra un mensaje al usuario

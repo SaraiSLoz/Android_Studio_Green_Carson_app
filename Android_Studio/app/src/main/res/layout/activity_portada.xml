@@ -23,15 +23,15 @@
             android:layout_width="208dp"
             android:layout_height="200dp"
             app:srcCompat="@drawable/logo_final_removebg_preview"
-            tools:ignore="ContentDescription" />
+            tools:ignore="ContentDescription,ImageContrastCheck" />
 
         <TextView
             android:id="@+id/textView6"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:fontFamily="@font/archivo_black"
             android:layout_marginTop="50dp"
-            android:text="Reecicla"
+            android:fontFamily="@font/archivo_black"
+            android:text="Reeportes"
             android:textColor="@color/white"
             android:textSize="20pt"
             tools:ignore="HardcodedText,SpUsage,TextContrastCheck" />
@@ -46,15 +46,5 @@
             android:textSize="16dp"
             tools:ignore="HardcodedText,SpUsage,TextSizeCheck" />
 
-        <Button
-            android:id="@+id/button_continuar"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="50dp"
-            android:backgroundTint="#47ba6c"
-            android:text="Continuar"
-            android:textColor="@color/black"
-            app:cornerRadius="10dp"
-            tools:ignore="HardcodedText" />
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

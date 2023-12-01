@@ -109,7 +109,7 @@ abstract class PdfChartGeneratorUsers extends Context {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
 
         builder.setTitle("Documento descargado con éxito")
-                .setMessage("El pdf fue guardado con éxito en Descargas")
+                .setMessage("El pdf fue guardado en Descargas")
                 .setPositiveButton("Entendido", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss(); // Cierra el diálogo
@@ -175,10 +175,7 @@ abstract class PdfChartGeneratorUsers extends Context {
     @RequiresApi(api = Build.VERSION_CODES.O)
     private static void savePdf(Context context, PdfDocument pdfDocument, String pdfFileName) {
         File directory = new File(Environment.getExternalStorageDirectory(), "Download");
-
-        if (!directory.exists()) {
-            directory.mkdirs();
-        }
+        directory.mkdirs();
 
         File file = new File(directory, pdfFileName + ".pdf");
 
@@ -224,7 +221,7 @@ public class UsuariosActivity extends AppCompatActivity {
         descarga.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                descargarPDF();
+                mostrarAlertDialog();
             }
         });
 
@@ -234,21 +231,26 @@ public class UsuariosActivity extends AppCompatActivity {
     private void mostrarAlertDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
-        builder.setTitle("Documento descargado")
-                .setMessage("El pdf fue generado")
-                .setPositiveButton("Entendido", new DialogInterface.OnClickListener() {
+        builder.setTitle("Descargar Documento")
+                .setMessage("¿Estas seguro de que deseas descargar este documento? ")
+                .setPositiveButton("Descargar", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        descargarPDF();
+                    }
+                })
+                .setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss(); // Cierra el diálogo
                     }
-                });
+                })
+
+        ;
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
     }
     @SuppressLint("NewApi")
     private void descargarPDF() {
-
         PdfChartGeneratorUsers.generatePdfFromChart(this, barChart, pieChart,"grafica_users");
-        mostrarAlertDialog();
     }
     private void setupChart() {
         barChart = findViewById(R.id.barChart);
@@ -446,7 +448,8 @@ public class UsuariosActivity extends AppCompatActivity {
         entries.add(new PieEntry(inactiveCount, "Inactivo"));
 
         PieDataSet dataSet = new PieDataSet(entries, "");
-        dataSet.setColors(ColorTemplate.COLORFUL_COLORS); // or use your own color array
+        int[] colors = new int[]{Color.rgb(67, 160, 71), Color.rgb(239, 83, 80)}; // RGB values for green and red
+        dataSet.setColors(colors);
         dataSet.setValueTextColor(Color.WHITE);
         dataSet.setValueTextSize(12f);
 

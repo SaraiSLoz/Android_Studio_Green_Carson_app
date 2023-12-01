@@ -3,135 +3,114 @@ package com.example.bit_3;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.Typeface;
+import android.graphics.drawable.GradientDrawable;
 import android.graphics.pdf.PdfDocument;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageButton;
-
-import android.graphics.Color;
-import android.os.Bundle;
-import android.view.View;
-import android.widget.ImageButton;
-
-import androidx.annotation.RequiresApi;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import android.util.Log;
-import androidx.annotation.Nullable;
-import android.animation.ValueAnimator;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.LinearGradient;
-import android.graphics.Shader;
-import android.graphics.Paint;
-import android.graphics.Color;
-import android.graphics.drawable.Drawable;
-import android.graphics.drawable.GradientDrawable;
-import android.os.Handler;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
-import com.github.mikephil.charting.charts.BarChart;
-import com.github.mikephil.charting.components.XAxis;
-import com.github.mikephil.charting.data.BarData;
-import com.github.mikephil.charting.data.BarDataSet;
-import com.github.mikephil.charting.data.BarEntry;
-import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
-import com.github.mikephil.charting.utils.ColorTemplate;
-import com.github.mikephil.charting.components.YAxis;
-import com.github.mikephil.charting.formatter.ValueFormatter;
-import com.github.mikephil.charting.components.Legend;
-import com.github.mikephil.charting.charts.PieChart;
-import com.github.mikephil.charting.data.PieData;
-import com.github.mikephil.charting.data.PieDataSet;
-import com.github.mikephil.charting.data.PieEntry;
-import com.github.mikephil.charting.utils.ColorTemplate;
 import com.github.mikephil.charting.animation.Easing;
 import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.charts.PieChart;
+import com.github.mikephil.charting.components.Legend;
+import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
-import com.github.mikephil.charting.utils.ColorTemplate;
+import com.github.mikephil.charting.data.PieData;
+import com.github.mikephil.charting.data.PieDataSet;
+import com.github.mikephil.charting.data.PieEntry;
 import com.github.mikephil.charting.formatter.ValueFormatter;
-import com.github.mikephil.charting.components.XAxis;
-import com.github.mikephil.charting.components.YAxis;
-import com.github.mikephil.charting.components.Legend;
-import com.github.mikephil.charting.data.Entry;
-import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
-
 import com.google.firebase.firestore.EventListener;
-import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Locale;
-
-
-import androidx.appcompat.app.AppCompatActivity;
+import java.util.Map;
 
 abstract class PdfChartGenerator extends Context {
 
     // Esta función genera un PDF a partir de un gráfico
     @SuppressLint("NewApi")
-    public static void generatePdfFromChart(Context context, LineChart chart, PieChart pie, String pdfFileName) {
+    public static void generatePdfFromChart(Context context, LineChart chart, PieChart pie, String tx1, String tx2, String pdfFileName) {
         // Crea un documento PDF
         PdfDocument pdfDocument = new PdfDocument();
 
         // Configura el tamaño de la página
-        int width = chart.getWidth(); //612 y 792
-        int height = chart.getHeight()+ pie.getHeight() + 150;
-
+        int width = 612; //612 y 792
+        int height = 792;
         // Configura la página
         PdfDocument.PageInfo pageInfo = new PdfDocument.PageInfo.Builder(width, height, 2).create();
         PdfDocument.Page page = pdfDocument.startPage(pageInfo);
+        float scalePercent = 30f;
         Paint paint = new Paint();
         paint.setColor(Color.BLACK);
-        paint.setTextSize(50f);
+        paint.setTextSize(15f);
         paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
+        Paint paint2 = new Paint();
+        paint2.setColor(Color.BLACK);
+        paint2.setTextSize(8f);
         // Dibuja el contenido del gráfico en la página
         Canvas canvas = page.getCanvas();
-        Bitmap bitmap = getChartBitmap(chart);
-        canvas.drawText("Recolecciones",150, 50 ,paint);
-        canvas.drawBitmap(bitmap, 0, 20, null);
+        Bitmap scaledChartBitmap = scaleChart(chart, scalePercent);
+        Bitmap scaledPieBitmap = scalePie(pie, scalePercent);
+        canvas.drawText("Recolectores en Servicio: ", 50, 20, paint);
+        canvas.drawText(tx1, 50, 40, paint);
+        canvas.drawText("Recolectores Totales: ", 50, 60, paint);
+        canvas.drawText(tx2, 50, 80, paint);
+        canvas.drawText("Recolecciones", 290, 80, paint);
+        canvas.drawBitmap(scaledChartBitmap, 150, 100, null);
         Bitmap bitmappie = getPieBitMap(pie);
-        canvas.drawText("Usuarios",150, chart.getHeight()+50 ,paint);
-        canvas.drawBitmap(bitmappie, 0, chart.getHeight()+70, null);
+        canvas.drawText("Usuarios", 290, 440, paint);
+        canvas.drawBitmap(scaledPieBitmap, 150, 450, null);
+        // Añadir hora actual al PDF
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
+        canvas.drawText("Fecha de creación: " + timeStamp, 100, height - 20, paint2);
+        canvas.drawText("Usuarios", 150, chart.getHeight() + 50, paint);
+        canvas.drawBitmap(bitmappie, 0, chart.getHeight() + 70, null);
         // Finaliza la página
         pdfDocument.finishPage(page);
-
         // Guarda el documento en un archivo PDF
         savePdf(context, pdfDocument, pdfFileName);
-
         // Cierra el documento
         pdfDocument.close();
-
         mostrarAlertDialog(context);
     }
-
     private static void mostrarAlertDialog(Context context) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
-
         builder.setTitle("Documento descargado con éxito")
-                .setMessage("El pdf fue guardado con éxito en Descargas")
+                .setMessage("El pdf fue guardado en Descargas")
                 .setPositiveButton("Entendido", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss(); // Cierra el diálogo
@@ -140,44 +119,70 @@ abstract class PdfChartGenerator extends Context {
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
     }
-    private static Bitmap getPieBitMap(PieChart pie) {
-        pie.setDrawingCacheEnabled(true);
-        pie.buildDrawingCache(true);
-        Bitmap bitmap = Bitmap.createBitmap(pie.getDrawingCache());
-        pie.setDrawingCacheEnabled(false);
-        return bitmap;
-    }
+            public static Bitmap scaleChart(LineChart chart, float scalePercent) {
+                // Convierte la gráfica a un mapa de bits
+                Bitmap chartBitmap = getChartBitmap(chart);
 
+                // Obtiene las dimensiones originales
+                int originalWidth = chartBitmap.getWidth();
+                int originalHeight = chartBitmap.getHeight();
 
-    // Esta función convierte el gráfico a un mapa de bits para su posterior uso en el PDF
-    private static Bitmap getChartBitmap(LineChart chart) {
-        chart.setDrawingCacheEnabled(true);
-        chart.buildDrawingCache(true);
-        Bitmap bitmap = Bitmap.createBitmap(chart.getDrawingCache());
-        chart.setDrawingCacheEnabled(false);
-        return bitmap;
-    }
+                // Calcula las nuevas dimensiones después de escalar
+                int newWidth = (int) (originalWidth * scalePercent / 100);
+                int newHeight = (int) (originalHeight * scalePercent / 100);
 
-    // Esta función guarda el documento PDF en el almacenamiento externo
-    @RequiresApi(api = Build.VERSION_CODES.O)
-    private static void savePdf(Context context, PdfDocument pdfDocument, String pdfFileName) {
-        File directory = new File(Environment.getExternalStorageDirectory(), "Download");
+                // Escala el mapa de bits
+                Bitmap scaledChartBitmap = Bitmap.createScaledBitmap(chartBitmap, newWidth, newHeight, true);
 
-        if (!directory.exists()) {
-            directory.mkdirs();
+                return scaledChartBitmap;
+            }
+            public static Bitmap scalePie(PieChart chart, float scalePercent) {
+                // Convierte la gráfica a un mapa de bits
+                Bitmap chartBitmap = getPieBitMap(chart);
+
+                // Obtiene las dimensiones originales
+                int originalWidth = chartBitmap.getWidth();
+                int originalHeight = chartBitmap.getHeight();
+
+                // Calcula las nuevas dimensiones después de escalar
+                int newWidth = (int) (originalWidth * scalePercent / 100);
+                int newHeight = (int) (originalHeight * scalePercent / 100);
+
+                // Escala el mapa de bits
+                Bitmap scaledChartBitmap = Bitmap.createScaledBitmap(chartBitmap, newWidth, newHeight, true);
+
+                return scaledChartBitmap;
+            }
+
+            private static Bitmap getPieBitMap(PieChart pie) {
+                pie.setDrawingCacheEnabled(true);
+                pie.buildDrawingCache(true);
+                Bitmap bitmap = Bitmap.createBitmap(pie.getDrawingCache());
+                pie.setDrawingCacheEnabled(false);
+                return bitmap;
+            }
+            // Esta función convierte el gráfico a un mapa de bits para su posterior uso en el PDF
+            private static Bitmap getChartBitmap(LineChart chart) {
+                chart.setDrawingCacheEnabled(true);
+                chart.buildDrawingCache(true);
+                Bitmap bitmap = Bitmap.createBitmap(chart.getDrawingCache());
+                chart.setDrawingCacheEnabled(false);
+                return bitmap;
+            }
+            // Esta función guarda el documento PDF en el almacenamiento externo
+            @RequiresApi(api = Build.VERSION_CODES.O)
+            private static void savePdf(Context context, PdfDocument pdfDocument, String pdfFileName) {
+                    File directory = new File(Environment.getExternalStorageDirectory(), "Download");
+                    directory.mkdirs();
+                    File file = new File(directory, pdfFileName + ".pdf");
+                    try {
+                        pdfDocument.writeTo(Files.newOutputStream(file.toPath()));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        Toast.makeText(context, "Error al guardar el PDF", Toast.LENGTH_SHORT).show();
+                    }
+            }
         }
-
-        File file = new File(directory, pdfFileName + ".pdf");
-
-        try {
-            pdfDocument.writeTo(Files.newOutputStream(file.toPath()));
-        } catch (IOException e) {
-            e.printStackTrace();
-            Toast.makeText(context, "Error al guardar el PDF", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-}
 
 
 public class RecolectoresActivity extends AppCompatActivity {
@@ -197,6 +202,8 @@ public class RecolectoresActivity extends AppCompatActivity {
     private TextView activeCollectorsTextView;
     private TextView totalCollectorsTextView;
 
+    String text1,text2;
+    CharSequence text_c, text1_c;
     @RequiresApi(api = Build.VERSION_CODES.O)
 
     @SuppressLint("MissingInflatedId")
@@ -235,20 +242,26 @@ public class RecolectoresActivity extends AppCompatActivity {
     private void mostrarAlertDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
-        builder.setTitle("Documento descargado")
-                .setMessage("El pdf fue generado")
-                .setPositiveButton("Entendido", new DialogInterface.OnClickListener() {
+        builder.setTitle("Descargar Documento")
+                .setMessage("¿Estas seguro de que deseas descargar este documento? ")
+                .setPositiveButton("Descargar", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        descargarPDF();
+                    }
+                })
+                .setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss(); // Cierra el diálogo
                     }
-                });
+                })
+
+        ;
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
     }
     @SuppressLint("NewApi")
     private void descargarPDF() {
-        PdfChartGenerator.generatePdfFromChart(this, collectionTimeLineChart, pieChart, "graficas5");
-        mostrarAlertDialog();
+        PdfChartGenerator.generatePdfFromChart(this, collectionTimeLineChart, pieChart, text1, text2, "grafica_recolectores");
     }
 
     private void loadCollectorsData() {
@@ -285,6 +298,10 @@ public class RecolectoresActivity extends AppCompatActivity {
         runOnUiThread(() -> {
             activeCollectorsTextView.setText(String.valueOf(active));
             totalCollectorsTextView.setText(String.valueOf(total));
+            text_c = activeCollectorsTextView.getText();
+            text1 = text_c.toString();
+            text1_c = totalCollectorsTextView.getText();
+            text2 = text1_c.toString();
         });
     }
 

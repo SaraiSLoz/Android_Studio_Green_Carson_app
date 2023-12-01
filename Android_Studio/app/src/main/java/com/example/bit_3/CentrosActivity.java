@@ -3,81 +3,37 @@ package com.example.bit_3;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.graphics.pdf.PdfDocument;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageButton;
-
-import android.graphics.Color;
-import android.os.Bundle;
-import android.view.View;
-import android.widget.ImageButton;
-
-import androidx.annotation.RequiresApi;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import android.util.Log;
-import androidx.annotation.Nullable;
-import android.animation.ValueAnimator;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.LinearGradient;
-import android.graphics.Shader;
-import android.graphics.Paint;
-import android.graphics.Color;
-import android.graphics.drawable.Drawable;
-import android.graphics.drawable.GradientDrawable;
-import android.os.Handler;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.github.mikephil.charting.charts.BarChart;
-import com.github.mikephil.charting.components.XAxis;
-import com.github.mikephil.charting.data.BarData;
-import com.github.mikephil.charting.data.BarDataSet;
-import com.github.mikephil.charting.data.BarEntry;
-import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
-import com.github.mikephil.charting.utils.ColorTemplate;
-import com.github.mikephil.charting.components.YAxis;
-import com.github.mikephil.charting.formatter.ValueFormatter;
-import com.github.mikephil.charting.components.Legend;
-import com.github.mikephil.charting.charts.PieChart;
-import com.github.mikephil.charting.data.PieData;
-import com.github.mikephil.charting.data.PieDataSet;
-import com.github.mikephil.charting.data.PieEntry;
-import com.github.mikephil.charting.utils.ColorTemplate;
-import com.github.mikephil.charting.animation.Easing;
 import com.github.mikephil.charting.charts.LineChart;
-import com.github.mikephil.charting.data.Entry;
-import com.github.mikephil.charting.data.LineData;
-import com.github.mikephil.charting.data.LineDataSet;
-import com.github.mikephil.charting.utils.ColorTemplate;
-import com.github.mikephil.charting.formatter.ValueFormatter;
-import com.github.mikephil.charting.components.XAxis;
-import com.github.mikephil.charting.components.YAxis;
-import com.github.mikephil.charting.components.Legend;
-import com.github.mikephil.charting.data.Entry;
-import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
-
-import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.components.XAxis;
-import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
-import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
 import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.github.mikephil.charting.utils.ColorTemplate;
 import com.google.firebase.firestore.EventListener;
@@ -85,12 +41,6 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
-
-import com.google.firebase.firestore.EventListener;
-import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.QuerySnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.io.File;
 import java.io.IOException;
@@ -100,22 +50,15 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Locale;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
-
-
-import androidx.appcompat.app.AppCompatActivity;
 
 abstract class PdfChartGeneratorCentros extends Context {
 
     // Esta función genera un PDF a partir de un gráfico
     @SuppressLint("NewApi")
-    public static void generatePdfFromChart(Context context, PieChart pie, String tx1, String tx2, String pdfFileName) {
+    public static void generatePdfFromChart(Context context, PieChart pie, BarChart chart,String tx1, String tx2, String pdfFileName) {
         // Crea un documento PDF
         PdfDocument pdfDocument = new PdfDocument();
 
@@ -140,14 +83,17 @@ abstract class PdfChartGeneratorCentros extends Context {
 
         Bitmap scaledPieBitmap = scalePie(pie, scalePercent);
         canvas.drawText("Número de centros en servicio: ",50, 60 ,paint);
-        canvas.drawText(tx1,50, 70 ,paint);
-        canvas.drawText("Centros Totales: ",50, 90 ,paint);
-        canvas.drawText(tx2,50, 100 ,paint);
-        canvas.drawText("Estado de los Centros: ",290, 150,paint);
-        canvas.drawBitmap(scaledPieBitmap, 150, 160, null);
+        canvas.drawText(tx1,50, 80 ,paint);
+        canvas.drawText("Centros Totales: ",50, 100 ,paint);
+        canvas.drawText(tx2,50, 120 ,paint);
+        canvas.drawText("Estado de los Centros: ",200, 160,paint);
+        canvas.drawBitmap(scaledPieBitmap, 150, 170, null);
+        Bitmap scaledChartBitmap = scaleChart(chart, scalePercent);
+        canvas.drawText("Cantidad de centros por categoría:  ",200, 500,paint);
+        canvas.drawBitmap(scaledChartBitmap, 150, 520, null);
         // Añadir hora actual al PDF
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
-        canvas.drawText("Fecha de creación: " + timeStamp, 100, height - 20, paint2);
+        canvas.drawText("Fecha de creación: " + timeStamp, 50, height - 20, paint2);
         // Finaliza la página
         pdfDocument.finishPage(page);
 
@@ -163,8 +109,8 @@ abstract class PdfChartGeneratorCentros extends Context {
     private static void mostrarAlertDialog(Context context) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
 
-        builder.setTitle("Documento descargado con éxito")
-                .setMessage("El pdf fue guardado con éxito en Descargas")
+        builder.setTitle("Documento Descargado con éxito")
+                .setMessage("El pdf fue guardado en Descargas.")
                 .setPositiveButton("Entendido", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss(); // Cierra el diálogo
@@ -173,7 +119,7 @@ abstract class PdfChartGeneratorCentros extends Context {
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
     }
-    public static Bitmap scaleChart(LineChart chart, float scalePercent) {
+    public static Bitmap scaleChart(BarChart chart, float scalePercent) {
         // Convierte la gráfica a un mapa de bits
         Bitmap chartBitmap = getChartBitmap(chart);
 
@@ -218,7 +164,7 @@ abstract class PdfChartGeneratorCentros extends Context {
 
 
     // Esta función convierte el gráfico a un mapa de bits para su posterior uso en el PDF
-    private static Bitmap getChartBitmap(LineChart chart) {
+    private static Bitmap getChartBitmap(BarChart chart) {
         chart.setDrawingCacheEnabled(true);
         chart.buildDrawingCache(true);
         Bitmap bitmap = Bitmap.createBitmap(chart.getDrawingCache());
@@ -230,11 +176,7 @@ abstract class PdfChartGeneratorCentros extends Context {
     @RequiresApi(api = Build.VERSION_CODES.O)
     private static void savePdf(Context context, PdfDocument pdfDocument, String pdfFileName) {
         File directory = new File(Environment.getExternalStorageDirectory(), "Download");
-
-        if (!directory.exists()) {
-            directory.mkdirs();
-        }
-
+        directory.mkdirs();
         File file = new File(directory, pdfFileName + ".pdf");
 
         try {
@@ -296,7 +238,7 @@ public class CentrosActivity extends AppCompatActivity {
         descarga.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                descargarPDF();
+                mostrarAlertDialog();
             }
         });
 
@@ -305,21 +247,26 @@ public class CentrosActivity extends AppCompatActivity {
     private void mostrarAlertDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
-        builder.setTitle("Documento descargado")
-                .setMessage("El pdf fue generado")
-                .setPositiveButton("Entendido", new DialogInterface.OnClickListener() {
+        builder.setTitle("Descargar Documento")
+                .setMessage("¿Estas seguro de que deseas descargar este documento? ")
+                .setPositiveButton("Descargar", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        descargarPDF();
+                    }
+                })
+                .setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss(); // Cierra el diálogo
                     }
-                });
+                })
+
+        ;
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
     }
     @SuppressLint("NewApi")
     private void descargarPDF() {
-
-        PdfChartGeneratorCentros.generatePdfFromChart(this, pieChart, text1, text2, "grafica_centros");
-        mostrarAlertDialog();
+        PdfChartGeneratorCentros.generatePdfFromChart(this, pieChart, barChart,text1, text2, "grafica_centros");
     }
 
 
@@ -544,10 +491,6 @@ public class CentrosActivity extends AppCompatActivity {
         barChart.animateY(1000); // Animate the chart on the first load
         barChart.invalidate(); // Refresca el gráfico
     }
-
-
-
-
 
 
 }

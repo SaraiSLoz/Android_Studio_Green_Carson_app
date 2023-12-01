@@ -38,7 +38,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:fontFamily="@font/archivo_black"
-        android:text="Residuos"
+        android:text="Materiales"
         android:textColor="@color/white"
         android:textSize="30sp"
         app:layout_constraintBottom_toBottomOf="@+id/imageView9"
@@ -46,17 +46,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/fondo"
         tools:ignore="HardcodedText" />
-
-    <ImageButton
-        android:id="@+id/atras_b"
-        android:layout_width="48dp"
-        android:layout_height="45dp"
-        app:layout_constraintBottom_toBottomOf="@+id/imageView9"
-        app:layout_constraintEnd_toStartOf="@+id/residuos"
-        app:layout_constraintStart_toStartOf="@+id/imageView9"
-        app:layout_constraintTop_toTopOf="@+id/fondo"
-        app:srcCompat="@drawable/android_arrow_back_icon_icons_com_50546"
-        android:background="@null"/>
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="0dp"
@@ -377,6 +366,18 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.794"
                 app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <Button
+                android:id="@+id/button_descarga"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="#2fb0c6"
+                android:text="Descargar"
+                app:cornerRadius="10dp"
+                app:layout_constraintBottom_toTopOf="@+id/horizontalBarChart"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/title"
                 app:layout_constraintTop_toTopOf="parent" />
 
 
