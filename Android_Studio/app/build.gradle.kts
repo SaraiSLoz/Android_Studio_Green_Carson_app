@@ -5,11 +5,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.bit_3"
+    namespace = "com.bit3.reeportes"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.bit_3"
+        applicationId = "com.bit3.reeportes"
         minSdk = 24
         targetSdk = 34
         versionCode = 1

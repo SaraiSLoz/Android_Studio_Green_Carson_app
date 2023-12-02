@@ -4,21 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ResiduosActivity">
-
-    <ImageView
-        android:id="@+id/fondo"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0"
-        app:srcCompat="@drawable/gc_app_pantallas_blanco"
-        tools:ignore="ContentDescription" />
-
+    tools:context=".ResiduosActivity"
+    android:background="@drawable/gc_app_pantallas_blanco">
 
 
     <ImageView
@@ -27,8 +14,9 @@
         android:layout_height="100dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/fondo"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.0"
         app:srcCompat="@drawable/cuadrado"
         tools:ignore="ContentDescription" />
@@ -43,8 +31,10 @@
         android:textSize="30sp"
         app:layout_constraintBottom_toBottomOf="@+id/imageView9"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/fondo"
+
+        app:layout_constraintTop_toTopOf="@+id/imageView9"
         tools:ignore="HardcodedText" />
 
     <androidx.core.widget.NestedScrollView
@@ -72,291 +62,6 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <ImageView
-                android:id="@+id/aceite_auto"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:layout_marginTop="83.9dp"
-                android:src="@drawable/aceite_auto"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.041"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <ImageView
-                android:id="@+id/aceite_usado"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:layout_marginTop="8.2dp"
-                android:src="@drawable/aceite_usado"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.041"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/aceite_auto" />
-
-            <ImageView
-                android:id="@+id/arbol"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:layout_marginTop="8.2dp"
-                android:src="@drawable/arbol"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.041"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/aceite_usado" />
-
-            <ImageView
-                android:id="@+id/baterias"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:layout_marginTop="8.2dp"
-                android:src="@drawable/baterias"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.041"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/arbol" />
-
-            <ImageView
-                android:id="@+id/bicicletas"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:layout_marginTop="8.2dp"
-                android:src="@drawable/bici"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.041"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/baterias" />
-
-            <ImageView
-                android:id="@+id/botellas"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:layout_marginTop="8.2dp"
-                android:src="@drawable/botellas"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.041"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/bicicletas" />
-
-            <ImageView
-                android:id="@+id/carton"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:layout_marginTop="8.2dp"
-                android:src="@drawable/carton"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.041"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/botellas" />
-
-            <ImageView
-                android:id="@+id/electronicos"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:layout_marginTop="8.2dp"
-                android:src="@drawable/electronicos"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.041"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/carton" />
-
-            <ImageView
-                android:id="@+id/escombro"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:layout_marginTop="8.2dp"
-                android:src="@drawable/escombro"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.041"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/electronicos" />
-
-            <ImageView
-                android:id="@+id/industriales"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:layout_marginTop="8.2dp"
-                android:src="@drawable/industriales"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.041"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/escombro" />
-
-            <ImageView
-                android:id="@+id/juguetes"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:layout_marginTop="8.2dp"
-                android:src="@drawable/juguetes"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.041"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/industriales" />
-
-            <ImageView
-                android:id="@+id/libros"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:layout_marginTop="8.2dp"
-                android:src="@drawable/libros"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.041"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/juguetes" />
-
-            <ImageView
-                android:id="@+id/llantas"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:layout_marginTop="8.2dp"
-                android:src="@drawable/llantas"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.041"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/libros" />
-
-            <ImageView
-                android:id="@+id/madera"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:layout_marginTop="8.2dp"
-                android:src="@drawable/madera"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.041"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/llantas" />
-
-            <ImageView
-                android:id="@+id/medicina"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:layout_marginTop="8.2dp"
-                android:src="@drawable/medicina"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.041"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/madera" />
-
-            <ImageView
-                android:id="@+id/metal"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:layout_marginTop="8.2dp"
-                android:src="@drawable/metal"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.041"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/medicina" />
-
-            <ImageView
-                android:id="@+id/organico"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:layout_marginTop="8.2dp"
-                android:src="@drawable/organico"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.041"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/metal" />
-
-            <ImageView
-                android:id="@+id/pallets"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:layout_marginTop="8.2dp"
-                android:src="@drawable/pallets"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.041"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/organico" />
-
-            <ImageView
-                android:id="@+id/papel"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:layout_marginTop="8.2dp"
-                android:src="@drawable/papel"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.041"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/pallets" />
-
-            <ImageView
-                android:id="@+id/pilas"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:layout_marginTop="8.2dp"
-                android:src="@drawable/pilas"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.041"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/papel" />
-
-            <ImageView
-                android:id="@+id/plasticos"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:layout_marginTop="8.2dp"
-                android:src="@drawable/plasticos"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.041"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/pilas" />
-
-            <ImageView
-                android:id="@+id/ropa"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:layout_marginTop="8.2dp"
-                android:src="@drawable/ropa"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.041"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/plasticos" />
-
-            <ImageView
-                android:id="@+id/tapitas"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:layout_marginTop="8.2dp"
-                android:src="@drawable/tapitas"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.041"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/ropa" />
-
-            <ImageView
-                android:id="@+id/tetrapack"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:layout_marginTop="8.2dp"
-                android:src="@drawable/tetrapack"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.041"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tapitas" />
-
-            <ImageView
-                android:id="@+id/toner"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:layout_marginTop="8.2dp"
-                android:src="@drawable/toner"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.041"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tetrapack" />
-
-            <ImageView
-                android:id="@+id/voluminoso"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:layout_marginTop="8.2dp"
-                android:src="@drawable/voluminoso"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.041"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/toner" />
 
             <com.github.mikephil.charting.charts.HorizontalBarChart
                 android:id="@+id/horizontalBarChart"
@@ -364,7 +69,7 @@
                 android:layout_height="774dp"
                 android:layout_marginTop="64dp"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.794"
+                app:layout_constraintHorizontal_bias="0.49"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 

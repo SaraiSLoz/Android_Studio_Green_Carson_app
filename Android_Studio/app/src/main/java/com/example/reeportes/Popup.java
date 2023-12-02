@@ -1,4 +1,4 @@
-package com.example.bit_3;
+package com.bit3.reeportes;
 
 import android.content.DialogInterface;
 import android.content.Intent;

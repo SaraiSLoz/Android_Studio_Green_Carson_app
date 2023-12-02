@@ -1,4 +1,4 @@
-package com.example.bit_3;
+package com.bit3.reeportes;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -232,7 +232,7 @@ public class RecolectoresActivity extends AppCompatActivity {
         descargarPDFButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                descargarPDF();
+                mostrarAlertDialog();
             }
         });
 

@@ -1,5 +1,6 @@
-package com.example.bit_3;
+package com.bit3.reeportes;
 
+import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -15,7 +16,6 @@ import android.os.Environment;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -24,16 +24,17 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.github.mikephil.charting.charts.BarChart;
-import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
+import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
 import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.github.mikephil.charting.utils.ColorTemplate;
 import com.google.firebase.firestore.EventListener;
@@ -47,18 +48,20 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.Set;
 
-abstract class PdfChartGeneratorCentros extends Context {
+abstract class PdfChartGeneratorUsers extends Context {
 
     // Esta función genera un PDF a partir de un gráfico
     @SuppressLint("NewApi")
-    public static void generatePdfFromChart(Context context, PieChart pie, BarChart chart,String tx1, String tx2, String pdfFileName) {
+    public static void generatePdfFromChart(Context context, BarChart chart, PieChart pie, String pdfFileName) {
         // Crea un documento PDF
         PdfDocument pdfDocument = new PdfDocument();
 
@@ -80,20 +83,16 @@ abstract class PdfChartGeneratorCentros extends Context {
         paint2.setTextSize(8f);
         // Dibuja el contenido del gráfico en la página
         Canvas canvas = page.getCanvas();
-
-        Bitmap scaledPieBitmap = scalePie(pie, scalePercent);
-        canvas.drawText("Número de centros en servicio: ",50, 60 ,paint);
-        canvas.drawText(tx1,50, 80 ,paint);
-        canvas.drawText("Centros Totales: ",50, 100 ,paint);
-        canvas.drawText(tx2,50, 120 ,paint);
-        canvas.drawText("Estado de los Centros: ",200, 160,paint);
-        canvas.drawBitmap(scaledPieBitmap, 150, 170, null);
         Bitmap scaledChartBitmap = scaleChart(chart, scalePercent);
-        canvas.drawText("Cantidad de centros por categoría:  ",200, 500,paint);
-        canvas.drawBitmap(scaledChartBitmap, 150, 520, null);
+        Bitmap scaledPieBitmap = scalePie(pie, scalePercent);
+        canvas.drawText("Recolecciones",290, 80 ,paint);
+        canvas.drawBitmap(scaledChartBitmap, 150, 100, null);
+        Bitmap bitmappie = getPieBitMap(pie);
+        canvas.drawText("Usuarios",290, 440,paint);
+        canvas.drawBitmap(scaledPieBitmap, 150, 450, null);
         // Añadir hora actual al PDF
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
-        canvas.drawText("Fecha de creación: " + timeStamp, 50, height - 20, paint2);
+        canvas.drawText("Fecha de creación: " + timeStamp, 100, height - 20, paint2);
         // Finaliza la página
         pdfDocument.finishPage(page);
 
@@ -109,8 +108,8 @@ abstract class PdfChartGeneratorCentros extends Context {
     private static void mostrarAlertDialog(Context context) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
 
-        builder.setTitle("Documento Descargado con éxito")
-                .setMessage("El pdf fue guardado en Descargas.")
+        builder.setTitle("Documento descargado con éxito")
+                .setMessage("El pdf fue guardado en Descargas")
                 .setPositiveButton("Entendido", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss(); // Cierra el diálogo
@@ -177,6 +176,7 @@ abstract class PdfChartGeneratorCentros extends Context {
     private static void savePdf(Context context, PdfDocument pdfDocument, String pdfFileName) {
         File directory = new File(Environment.getExternalStorageDirectory(), "Download");
         directory.mkdirs();
+
         File file = new File(directory, pdfFileName + ".pdf");
 
         try {
@@ -188,59 +188,43 @@ abstract class PdfChartGeneratorCentros extends Context {
     }
 
 }
-public class CentrosActivity extends AppCompatActivity {
-
+public class UsuariosActivity extends AppCompatActivity {
     Button descarga;
-    private LineChart collectionTimeLineChart;
-
-    private PieChart pieChart;
-
-    private BarDataSet dataSet; // Add this line
-
     BarChart barChart;
 
+    PieChart pieChart;
+
     private boolean isFirstLoad = true;
-    private boolean isFirstLoad2 = true;
 
     private FirebaseFirestore db;
+    private BarDataSet dataSet; // Add this line
     private List<BarEntry> entries; // And this line
 
-    private TextView activeCentersTextView;
-    private TextView totalCentersTextView;
-    String text1,text2;
-    CharSequence text_c, text1_c;
 
     @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.centros);
+        setContentView(R.layout.usuarios);
 
+        // Initialize Firebase Firestore
         db = FirebaseFirestore.getInstance();
+        descarga = findViewById(R.id.button_des);
 
         // Setup the chart
-        //setupLineChart();
-        setupPieChart();
         setupChart();
+        setupPieChart();
         // Load data from Firestore
-        //loadCollectionTimesDataFromFirestore();
+        loadDataFromFirestore();
         loadStatusDataFromFirestore();
-        loadDataBarChart();
 
-        // Initialize TextViews
-        activeCentersTextView = findViewById(R.id.activeCenters); // Replace with your actual TextView ID
-        totalCentersTextView = findViewById(R.id.totalCenters); // Replace with your actual TextView ID
-
-        // Load data from Firestore
-        loadCentersData();
-
-        descarga = findViewById(R.id.descarga_b);
         descarga.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mostrarAlertDialog();
             }
         });
+
 
     }
 
@@ -266,51 +250,36 @@ public class CentrosActivity extends AppCompatActivity {
     }
     @SuppressLint("NewApi")
     private void descargarPDF() {
-        PdfChartGeneratorCentros.generatePdfFromChart(this, pieChart, barChart,text1, text2, "grafica_centros");
+        PdfChartGeneratorUsers.generatePdfFromChart(this, barChart, pieChart,"grafica_users");
+    }
+    private void setupChart() {
+        barChart = findViewById(R.id.barChart);
+        barChart.getDescription().setEnabled(false);
+        barChart.setFitBars(true);
+
+        XAxis xAxis = barChart.getXAxis();
+        xAxis.setValueFormatter(new IndexAxisValueFormatter(getAgeLabels()));
+        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+        xAxis.setDrawGridLines(false);
+
+        Legend legend = barChart.getLegend();
+        legend.setEnabled(true); // Enable the legend if you want to customize it
+        legend.setForm(Legend.LegendForm.NONE); // No form (shape), only text
+        legend.setTextSize(12f);
+        legend.setVerticalAlignment(Legend.LegendVerticalAlignment.BOTTOM);
+        legend.setHorizontalAlignment(Legend.LegendHorizontalAlignment.CENTER);
+        legend.setOrientation(Legend.LegendOrientation.HORIZONTAL);
+        legend.setDrawInside(false);
+        legend.setYOffset(5f); // Adjust the offset as needed
     }
 
 
-    private void loadCentersData() {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-
-        db.collection("centros")
-                .addSnapshotListener(new EventListener<QuerySnapshot>() {
-                    @Override
-                    public void onEvent(@Nullable QuerySnapshot snapshots,
-                                        @Nullable FirebaseFirestoreException e) {
-                        if (e != null) {
-                            Log.w("CentrosActivity", "Listen failed.", e);
-                            return;
-                        }
-
-                        int activeCount = 0;
-                        int totalCount = 0;
-                        if (snapshots != null) {
-                            for (QueryDocumentSnapshot doc : snapshots) {
-                                totalCount++;
-                                Boolean status = doc.getBoolean("estado");
-                                if (Boolean.TRUE.equals(status)) {
-                                    activeCount++;
-                                }
-                            }
-                            updateCollectorsCount(activeCount, totalCount);
-                        }
-                    }
-                });
-    }
-
-
-
-    private void updateCollectorsCount(int active, int total) {
-        // Update the text views on the main thread
-        runOnUiThread(() -> {
-            activeCentersTextView.setText(String.valueOf(active));
-            totalCentersTextView.setText(String.valueOf(total));
-            text_c = activeCentersTextView.getText();
-            text1 = text_c.toString();
-            text1_c = totalCentersTextView.getText();
-            text2 = text1_c.toString();
-        });
+    private List<String> getAgeLabels() {
+        List<String> labels = new ArrayList<>();
+        for (int i = 0; i <= 100; i++) {
+            labels.add(String.valueOf(i));
+        }
+        return labels;
     }
 
     private void setupPieChart() {
@@ -329,11 +298,31 @@ public class CentrosActivity extends AppCompatActivity {
         //legend.setEnabled(false);
     }
 
+    private void loadDataFromFirestore() {
+        db.collection("usuarios").addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot snapshots,
+                                @Nullable FirebaseFirestoreException e) {
+                if (e != null) {
+                    Log.w("FirestoreData", "Listen failed.", e);
+                    return;
+                }
 
-
+                Map<String, Long> ageData = new HashMap<>();
+                for (QueryDocumentSnapshot doc : snapshots) {
+                    if (doc.get("edad") != null) {
+                        String ageString = doc.getString("edad");
+                        Long ageCount = ageData.getOrDefault(ageString, 0L);
+                        ageData.put(ageString, ageCount + 1);
+                    }
+                }
+                updateChartWithFirestoreData(ageData);
+            }
+        });
+    }
 
     private void loadStatusDataFromFirestore() {
-        db.collection("centros").addSnapshotListener(new EventListener<QuerySnapshot>() {
+        db.collection("usuarios").addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot snapshots,
                                 @Nullable FirebaseFirestoreException e) {
@@ -345,11 +334,14 @@ public class CentrosActivity extends AppCompatActivity {
                 int activeCount = 0;
                 int inactiveCount = 0;
                 for (QueryDocumentSnapshot doc : snapshots) {
-                    Boolean status = doc.getBoolean("estado");
-                    if (Boolean.TRUE.equals(status)) {
-                        activeCount++;
-                    } else if (Boolean.FALSE.equals(status)) {
-                        inactiveCount++;
+                    Number statusNumber = doc.getLong("status"); // Using Number to be more generic
+                    if (statusNumber != null) {
+                        int status = statusNumber.intValue();
+                        if (status == 1) {
+                            activeCount++;
+                        } else if (status == 0) {
+                            inactiveCount++;
+                        }
                     }
                 }
                 updatePieChart(activeCount, inactiveCount);
@@ -358,8 +350,97 @@ public class CentrosActivity extends AppCompatActivity {
     }
 
 
+    private void updateChartWithFirestoreData(Map<String, Long> ageData) {
+        if (entries == null) {
+            entries = new ArrayList<>();
+        }
+
+        Set<Integer> updatedAges = new HashSet<>();
+
+        for (Map.Entry<String, Long> entry : ageData.entrySet()) {
+            int age = Integer.parseInt(entry.getKey());
+            float count = entry.getValue().floatValue();
+            updatedAges.add(age);
+
+            BarEntry barEntry = findBarEntryByAge(age);
+            if (barEntry != null) {
+                // If the bar already exists, animate the change if the count is different
+                if (barEntry.getY() != count) {
+                    ValueAnimator animator = ValueAnimator.ofFloat(barEntry.getY(), count);
+                    animator.setDuration(500); // Duration of the animation
+                    animator.addUpdateListener(animation -> {
+                        barEntry.setY((Float) animation.getAnimatedValue());
+                        dataSet.notifyDataSetChanged();
+                        barChart.invalidate(); // Invalidate on animation update to redraw the bar
+                    });
+                    animator.start();
+                }
+            } else {
+                // If the bar doesn't exist, add it to the entries
+                entries.add(new BarEntry(age, count));
+            }
+        }
+
+        // Remove any bars that no longer have data
+        entries.removeIf(barEntry -> !updatedAges.contains((int) barEntry.getX()));
+
+        // Adjust the Y-axis based on the updated entries
+        float maxY = entries.stream().max(Comparator.comparing(BarEntry::getY)).get().getY();
+        maxY += 1; // Add a buffer to the maximum value
+
+        // Update the Y-axis with the new maximum value
+        YAxis leftAxis = barChart.getAxisLeft();
+        leftAxis.setAxisMinimum(0); // Start at zero
+        leftAxis.setAxisMaximum(maxY); // New maximum value with buffer
+
+        // Same for the right Y-axis, if it's being used
+        YAxis rightAxis = barChart.getAxisRight();
+        rightAxis.setAxisMinimum(0);
+        rightAxis.setAxisMaximum(maxY);
+
+        // Calculate the new range for the X-axis
+        float maxX = entries.stream().max(Comparator.comparing(BarEntry::getX)).get().getX();
+        float minX = entries.stream().min(Comparator.comparing(BarEntry::getX)).get().getX();
+        barChart.getXAxis().setAxisMinimum(minX);
+        barChart.getXAxis().setAxisMaximum(maxX + 1); // +1 to ensure the last bar is fully visible
+
+        // Update or create the dataset and chart
+        if (dataSet == null) {
+            dataSet = new BarDataSet(entries, "Edades");
+            dataSet.setColors(ColorTemplate.MATERIAL_COLORS);
+            dataSet.setValueTextColor(Color.BLACK);
+            dataSet.setValueTextSize(16f);
+
+            dataSet.setValueFormatter(new ValueFormatter() {
+                @Override
+                public String getFormattedValue(float value) {
+                    // Return the value as an integer without decimal places
+                    return String.valueOf((int) value);
+                }
+            });
 
 
+            BarData barData = new BarData(dataSet);
+            barChart.setData(barData);
+            barChart.animateY(1000); // Animate the chart on the first load
+        } else {
+            dataSet.notifyDataSetChanged();
+            barChart.notifyDataSetChanged();
+            // No need to re-animate the entire chart here, as individual bar updates are animated
+        }
+
+        barChart.invalidate(); // Refresh the chart to show updated data
+    }
+
+    // Helper method to find a BarEntry by age
+    private BarEntry findBarEntryByAge(int age) {
+        for (BarEntry entry : entries) {
+            if ((int) entry.getX() == age) {
+                return entry;
+            }
+        }
+        return null;
+    }
 
     private void updatePieChart(int activeCount, int inactiveCount) {
         ArrayList<PieEntry> entries = new ArrayList<>();
@@ -368,7 +449,7 @@ public class CentrosActivity extends AppCompatActivity {
 
         PieDataSet dataSet = new PieDataSet(entries, "");
         int[] colors = new int[]{Color.rgb(67, 160, 71), Color.rgb(239, 83, 80)}; // RGB values for green and red
-        dataSet.setColors(colors); // Apply the custom colors
+        dataSet.setColors(colors);
         dataSet.setValueTextColor(Color.WHITE);
         dataSet.setValueTextSize(12f);
 
@@ -395,102 +476,10 @@ public class CentrosActivity extends AppCompatActivity {
         pieChart.invalidate(); // Refresh the chart
     }
 
-    private void setupChart() {
-        barChart = findViewById(R.id.barChart);
-        barChart.getDescription().setEnabled(false);
-        barChart.setFitBars(true);
 
-        XAxis xAxis = barChart.getXAxis();
-        //xAxis.setValueFormatter(new IndexAxisValueFormatter(getAgeLabels()));
-        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
-        xAxis.setDrawGridLines(false);
-
-        Legend legend = barChart.getLegend();
-        legend.setEnabled(true); // Enable the legend if you want to customize it
-        legend.setForm(Legend.LegendForm.NONE); // No form (shape), only text
-        legend.setTextSize(12f);
-        legend.setVerticalAlignment(Legend.LegendVerticalAlignment.BOTTOM);
-        legend.setHorizontalAlignment(Legend.LegendHorizontalAlignment.CENTER);
-        legend.setOrientation(Legend.LegendOrientation.HORIZONTAL);
-        legend.setDrawInside(false);
-        legend.setYOffset(5f); // Adjust the offset as needed
-    }
-
-
-    private void loadDataBarChart() {
-        db.collection("categorias").get().addOnCompleteListener(task -> {
-            if (task.isSuccessful() && task.getResult() != null) {
-                // Crear un mapa para almacenar el conteo de centros por categoría
-                Map<String, Integer> categoryCounts = new HashMap<>();
-                List<String> categoryNames = new ArrayList<>(); // Lista para guardar los nombres de las categorías
-                int totalCategories = task.getResult().size();
-                AtomicInteger processedCategories = new AtomicInteger(0);
-
-                // Recorrer los documentos de categorías
-                for (QueryDocumentSnapshot document : task.getResult()) {
-                    String categoryName = document.getId(); // Usar el ID del documento como nombre de la categoría
-                    categoryNames.add(categoryName); // Agregar a la lista de nombres de categorías
-
-                    // Ahora, para cada categoría, contar los centros asociados
-                    db.collection("centros").whereEqualTo("categoria", categoryName).get()
-                            .addOnCompleteListener(centrosTask -> {
-                                if (centrosTask.isSuccessful() && centrosTask.getResult() != null) {
-                                    // Agregar la cantidad de centros al mapa usando el ID del documento como clave
-                                    categoryCounts.put(categoryName, centrosTask.getResult().size());
-
-                                    // Comprobar si todas las categorías han sido procesadas
-                                    if (processedCategories.incrementAndGet() == totalCategories) {
-                                        updateChart(categoryCounts, categoryNames);
-                                    }
-                                }
-                            });
-                }
-            }
-        });
-    }
-
-    private void updateChart(Map<String, Integer> categoryCounts, List<String> categoryNames) {
-        List<BarEntry> chartEntries = new ArrayList<>();
-
-        int index = 0;
-        for (String categoryName : categoryNames) {
-            if (categoryCounts.containsKey(categoryName)) {
-                chartEntries.add(new BarEntry(index, categoryCounts.get(categoryName)));
-                index++;
-            }
-        }
-
-        BarDataSet barDataSet = new BarDataSet(chartEntries, ""); // Título en blanco
-        barDataSet.setColors(ColorTemplate.MATERIAL_COLORS);
-
-        BarData barData = new BarData(barDataSet);
-        barChart.setData(barData);
-
-        barChart.setExtraBottomOffset(10f); // Aumenta el margen inferior
-
-        XAxis xAxis = barChart.getXAxis();
-        xAxis.setLabelRotationAngle(90); // Rota las etiquetas en 90 grados
-        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
-        xAxis.setDrawLabels(true);
-        xAxis.setGranularity(1f);
-        xAxis.setGranularityEnabled(true);
-
-        xAxis.setValueFormatter(new ValueFormatter() {
-            @Override
-            public String getFormattedValue(float value) {
-                String categoryName = categoryNames.get((int) value);
-                StringBuilder verticalLabel = new StringBuilder();
-                for (char c : categoryName.toCharArray()) {
-                    verticalLabel.append(c).append("\n");
-                }
-                return verticalLabel.toString().trim();
-            }
-        });
-
-        barChart.notifyDataSetChanged();
-        barChart.animateY(1000); // Animate the chart on the first load
-        barChart.invalidate(); // Refresca el gráfico
-    }
 
 
 }
+
+
+
